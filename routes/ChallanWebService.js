@@ -11,7 +11,7 @@ var http = require('http');
 var ObjDB = require("./DataAccess.js");
 var ObjectDB = new ObjDB();
 
-exports.Ws_get_invoices = function(request, response) {
+exports.Ws_get_challans = function (request, response) {
 
     var objutil = require("./Utility.js");
 
@@ -23,30 +23,27 @@ exports.Ws_get_invoices = function(request, response) {
     var error = objutil.error;
     var Update = objutil.Update;
 
-
-    request.getConnection(function(err, connection) {
-
+    request.getConnection(function (err, connection) {
         if (err) {
             console.log("Error while connecting DB :" + err);
             response.send(error);
             return;
         } else {
-
-            ObjectDB.Ws_get_invoices(connection, function(callback) {
+            ObjectDB.get_challans(connection, function (callback) {
                 if (callback) {
                     data = callback;
                     var Arr_Temp = data;
                     var newsubstr = JSON.stringify(Arr_Temp);
-
                     if (newsubstr.indexOf("status") > -1 && newsubstr.indexOf("500") > -1 && newsubstr.indexOf("Internal server error") > -1) {
                         response.send(error);
                         return;
                     } else {
                         if (data.length > 0) {
-                            Result = '{"invoices" : ' + JSON.stringify(data) + '}';
+                            Result = '{"challans" : ' + JSON.stringify(data) + '}';
                             Result = Result.substring(0, Result.length - 1);
                             Result = Result + ',' + '"status":200';
                             Result = Result + ',' + '"message" :"success"' + '}';
+
                             response.send(Result);
                             return;
                         } else {
@@ -62,7 +59,7 @@ exports.Ws_get_invoices = function(request, response) {
 };
 
 //This web service is use to set customer details .
-exports.Ws_set_invoice = function(request, response) {
+exports.Ws_set_challan = function (request, response) {
 
     var objutil = require("./Utility.js");
 
@@ -83,20 +80,17 @@ exports.Ws_set_invoice = function(request, response) {
             var reqJsonString = request.body.data;
             console.log('Input Parameters :' + JSON.stringify(reqJsonString));
 
-
-            var cust_name = reqJsonString.cust_name;
-            var cust_contact = reqJsonString.cust_contact;
-            var cust_email = reqJsonString.cust_email;
-            var cust_address = reqJsonString.cust_address;
-            if (cust_name == "" || cust_name == null || cust_name == undefined ||
-                cust_contact == "" || cust_contact == null || cust_contact == undefined ||
-                cust_email == "" || cust_email == null || cust_email == undefined ||
-                cust_address == "" || cust_address == null || cust_address == undefined) {
+            var cust_id = reqJsonString.chal_cust_id;
+            var prod_id = reqJsonString.chal_prod_id;
+            var veh_id = reqJsonString.chal_veh_id;
+            var chal_qty = reqJsonString.chal_quantity;
+            if (cust_id == "" || cust_id == null || cust_id == undefined ||
+                prod_id == "" || prod_id == null || prod_id == undefined ||
+                veh_id == "" || veh_id == null || veh_id == undefined ||
+                chal_qty == "" || chal_qty == null || chal_qty == undefined) {
                 response.send(invalidData);
                 return;
             }
-
-
         } catch (err) {
             var errMessage = err.message;
             console.log("Error in data :" + errMessage);
@@ -104,34 +98,26 @@ exports.Ws_set_invoice = function(request, response) {
             return;
         }
     }
-    request.getConnection(function(err, connection) {
+
+    request.getConnection(function (err, connection) {
 
         if (err) {
-            console.log("Error while connecting DB :" + err);
             response.send(error);
             return;
         } else {
-            ObjectDB.set_customer_detail(cust_name, cust_contact, cust_email, cust_address, connection, function(callback) {
+            ObjectDB.set_challan_detail(cust_id, prod_id, veh_id, chal_qty, connection, function (callback) {
                 if (callback) {
-                    console.log("data is :" + JSON.stringify(callback));
                     data = JSON.stringify(callback);
 
                     if (callback.affectedRows < 1) {
                         response.send(error);
                         return;
                     } else {
-
                         if (callback.insertId > 0) {
-
-                            Result = '{"data" : ' + JSON.stringify(callback) + '}';
-                            Result = Result.substring(0, Result.length - 1);
-                            Result = Result + ',' + '"status":200';
-                            Result = Result + ',' + '"message" :"success"' + '}';
+                            Result = '{"status":200' + ',' + '"message" :"Challan added successfully."' + '}';
 
                             response.send(Result);
                             return;
-
-
                         } else {
                             Result = failure;
                             response.send(Result);
@@ -144,7 +130,7 @@ exports.Ws_set_invoice = function(request, response) {
     })
 };
 
-exports.Ws_get_invoice_products_by_id = function (request, response) {
+exports.Ws_get_challans_by_customer_id = function (request, response) {
 
     var objutil = require("./Utility.js");
 
@@ -156,21 +142,21 @@ exports.Ws_get_invoice_products_by_id = function (request, response) {
     var error = objutil.error;
     var Update = objutil.Update;
 
+    var reqJsonString;
+    var customerId;
+
     if (request.body.data) {
         try {
-            var reqJsonString = request.body.data;
+            reqJsonString = request.body.data;
+            customerId = reqJsonString.chal_cust_id;
 
-            var pur_id = reqJsonString.pur_id;
-            console.log("Get Invoice Products :" + pur_id);
-            if (pur_id == "" || pur_id == null || pur_id == undefined) {
+            if (customerId == "" || customerId == null || customerId == undefined) {
                 response.send(invalidData);
                 return;
             }
         } catch (err) {
             var errMessage = err.message;
-            console.log("Error in data :" + errMessage);
             response.send(error);
-
             return;
         }
     }
@@ -182,19 +168,18 @@ exports.Ws_get_invoice_products_by_id = function (request, response) {
             response.send(error);
             return;
         } else {
-            ObjectDB.Ws_get_invoice_products_by_id(pur_id, connection, function (callback) {
+            ObjectDB.get_challans_by_customer_id(customerId, connection, function (callback) {
                 if (callback) {
                     data = callback;
                     var Arr_Temp = data;
                     var newsubstr = JSON.stringify(Arr_Temp);
-                    console.log("Get Invoice Products :" + newsubstr);
 
                     if (newsubstr.indexOf("status") > -1 && newsubstr.indexOf("500") > -1 && newsubstr.indexOf("Internal server error") > -1) {
                         response.send(error);
                         return;
                     } else {
                         if (data.length > 0) {
-                            Result = '{"products" : ' + JSON.stringify(data) + '}';
+                            Result = '{"challans" : ' + JSON.stringify(data) + '}';
                             Result = Result.substring(0, Result.length - 1);
                             Result = Result + ',' + '"status":200';
                             Result = Result + ',' + '"message" :"success"' + '}';

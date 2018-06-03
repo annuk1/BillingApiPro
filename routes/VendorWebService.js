@@ -1,11 +1,18 @@
+//Declaration
 var express = require("express");
 var app = express();
 var bodyParser = require("body-parser");
 var request = require('request');
+var dateformat = require('dateformat');
+app.use(bodyParser.json()); // Body parser use JSON data
+
+var http = require('http');
+
 var ObjDB = require("./DataAccess.js");
 var ObjectDB = new ObjDB();
 
-exports.Ws_get_products = function(request, response) {
+exports.Ws_get_vendors = function(request, response) {
+
     var objutil = require("./Utility.js");
 
     var outPutData = "";
@@ -15,24 +22,29 @@ exports.Ws_get_products = function(request, response) {
     var delete1 = objutil.delete1;
     var error = objutil.error;
     var Update = objutil.Update;
+
+
+    var reqJsonObj, reqJsonString, lastupdateddatetime, p_meeting_ID, vis_fname, vis_mname, vis_lname, vis_imgurl, vis_comp, vis_mobnum, vis_emailID, vis_age, vis_ID, vis_IDnum, vis_AssetStr;
+
     request.getConnection(function(err, connection) {
 
         if (err) {
-            console.log("Error while connecting DB :" + err);
             response.send(error);
             return;
         } else {
-            ObjectDB.get_products(connection, function(callback) {
+            ObjectDB.get_vendor_details(connection, function(callback) {
                 if (callback) {
                     data = callback;
                     var Arr_Temp = data;
                     var newsubstr = JSON.stringify(Arr_Temp);
+
                     if (newsubstr.indexOf("status") > -1 && newsubstr.indexOf("500") > -1 && newsubstr.indexOf("Internal server error") > -1) {
                         response.send(error);
                         return;
                     } else {
+
                         if (data.length > 0) {
-                            Result = '{"products" : ' + JSON.stringify(data) + '}';
+                            Result = '{"vendors" : ' + JSON.stringify(data) + '}';
                             Result = Result.substring(0, Result.length - 1);
                             Result = Result + ',' + '"status":200';
                             Result = Result + ',' + '"message" :"success"' + '}';
@@ -49,11 +61,11 @@ exports.Ws_get_products = function(request, response) {
             });
         }
     })
-}
+};
 
-exports.Ws_set_product = function(request, response) {
-
+exports.Ws_set_vendor = function(request, response) {
     var objutil = require("./Utility.js");
+
     var outPutData = "";
     var success = objutil.Save;
     var failure = objutil.Failure;
@@ -62,18 +74,21 @@ exports.Ws_set_product = function(request, response) {
     var error = objutil.error;
     var Update = objutil.Update;
 
+
+    var reqJsonObj, reqJsonString, lastupdateddatetime, p_username;
+
     if (request.body.data) {
         try {
             var reqJsonString = request.body.data;
 
-            var prod_name = reqJsonString.prod_name;
-            var prod_desc = reqJsonString.prod_desc;
-            var prod_unit = reqJsonString.prod_unit;
-            var prod_rate = reqJsonString.prod_rate;
-            if (prod_name == "" || prod_name == null || prod_name == undefined ||
-                prod_desc == "" || prod_desc == null || prod_desc == undefined ||
-                prod_unit == "" || prod_unit == null || prod_unit == undefined ||
-                prod_rate == "" || prod_rate == null || prod_rate == undefined) {
+            var vend_name = reqJsonString.vend_name;
+            var vend_contact = reqJsonString.vend_contact;
+            var vend_email = reqJsonString.vend_email;
+            var vend_address = reqJsonString.vend_address;
+            if (vend_name == "" || vend_name == null || vend_name == undefined ||
+                vend_contact == "" || vend_contact == null || vend_contact == undefined ||
+                vend_email == "" || vend_email == null || vend_email == undefined ||
+                vend_address == "" || vend_address == null || vend_address == undefined) {
                 response.send(invalidData);
                 return;
             }
@@ -88,20 +103,19 @@ exports.Ws_set_product = function(request, response) {
     request.getConnection(function(err, connection) {
 
         if (err) {
+            console.log("Error while connecting DB :" + err);
             response.send(error);
             return;
         } else {
-            ObjectDB.set_product_detail(prod_name, prod_desc, prod_unit, prod_rate, connection, function(callback) {
+            ObjectDB.set_vendor_details(vend_name, vend_contact, vend_email, vend_address, connection, function(callback) {
                 if (callback) {
-                    data = JSON.stringify(callback);
-
+                    console.log("data is :" + callback)
                     if (callback.affectedRows < 1) {
                         response.send(error);
                         return;
                     } else {
-
                         if (callback.insertId > 0) {
-                            Result = '{"status":200'+',' + '"message" :"Product added successfully."' + '}';
+                            Result = '{"status":200'+',' + '"message" :"Vendor added successfully."' + '}';
                             response.send(Result);
                             return;
                         } else {
@@ -117,9 +131,10 @@ exports.Ws_set_product = function(request, response) {
 };
 
 
-exports.Ws_update_product = function(request, response) {
 
+exports.Ws_update_vendor = function(request, response) {
     var objutil = require("./Utility.js");
+
     var outPutData = "";
     var success = objutil.Save;
     var failure = objutil.Failure;
@@ -128,18 +143,21 @@ exports.Ws_update_product = function(request, response) {
     var error = objutil.error;
     var Update = objutil.Update;
 
+
+    var reqJsonObj, reqJsonString, lastupdateddatetime, p_username;
+
     if (request.body.data) {
         try {
             var reqJsonString = request.body.data;
 
-            var prod_name = reqJsonString.prod_name;
-            var prod_desc = reqJsonString.prod_desc;
-            var prod_unit = reqJsonString.prod_unit;
-            var prod_rate = reqJsonString.prod_rate;
-            if (prod_name == "" || prod_name == null || prod_name == undefined ||
-                prod_desc == "" || prod_desc == null || prod_desc == undefined ||
-                prod_unit == "" || prod_unit == null || prod_unit == undefined ||
-                prod_rate == "" || prod_rate == null || prod_rate == undefined) {
+            var vend_name = reqJsonString.vend_name;
+            var vend_contact = reqJsonString.vend_contact;
+            var vend_email = reqJsonString.vend_email;
+            var vend_address = reqJsonString.vend_address;
+            if (vend_name == "" || vend_name == null || vend_name == undefined ||
+                vend_contact == "" || vend_contact == null || vend_contact == undefined ||
+                vend_email == "" || vend_email == null || vend_email == undefined ||
+                vend_address == "" || vend_address == null || vend_address == undefined) {
                 response.send(invalidData);
                 return;
             }
@@ -154,20 +172,19 @@ exports.Ws_update_product = function(request, response) {
     request.getConnection(function(err, connection) {
 
         if (err) {
+            console.log("Error while connecting DB :" + err);
             response.send(error);
             return;
         } else {
-            ObjectDB.update_product_detail(prod_name, prod_desc, prod_unit, prod_rate, connection, function(callback) {
+            ObjectDB.update_vendor_details(vend_name, vend_contact, vend_email, vend_address, connection, function(callback) {
                 if (callback) {
-                    data = JSON.stringify(callback);
-
+                    console.log("data is :" + callback)
                     if (callback.affectedRows < 1) {
                         response.send(error);
                         return;
                     } else {
-
                         if (callback.insertId > 0) {
-                            Result = '{"status":200'+',' + '"message" :"Product added successfully."' + '}';
+                            Result = '{"status":200'+',' + '"message" :"Vendor added successfully."' + '}';
                             response.send(Result);
                             return;
                         } else {
@@ -182,10 +199,9 @@ exports.Ws_update_product = function(request, response) {
     })
 };
 
-
-exports.Ws_delete_product = function(request, response) {
-
+exports.Ws_delete_vendor = function(request, response) {
     var objutil = require("./Utility.js");
+
     var outPutData = "";
     var success = objutil.Save;
     var failure = objutil.Failure;
@@ -194,18 +210,21 @@ exports.Ws_delete_product = function(request, response) {
     var error = objutil.error;
     var Update = objutil.Update;
 
+
+    var reqJsonObj, reqJsonString, lastupdateddatetime, p_username;
+
     if (request.body.data) {
         try {
             var reqJsonString = request.body.data;
 
-            var prod_name = reqJsonString.prod_name;
-            var prod_desc = reqJsonString.prod_desc;
-            var prod_unit = reqJsonString.prod_unit;
-            var prod_rate = reqJsonString.prod_rate;
-            if (prod_name == "" || prod_name == null || prod_name == undefined ||
-                prod_desc == "" || prod_desc == null || prod_desc == undefined ||
-                prod_unit == "" || prod_unit == null || prod_unit == undefined ||
-                prod_rate == "" || prod_rate == null || prod_rate == undefined) {
+            var vend_name = reqJsonString.vend_name;
+            var vend_contact = reqJsonString.vend_contact;
+            var vend_email = reqJsonString.vend_email;
+            var vend_address = reqJsonString.vend_address;
+            if (vend_name == "" || vend_name == null || vend_name == undefined ||
+                vend_contact == "" || vend_contact == null || vend_contact == undefined ||
+                vend_email == "" || vend_email == null || vend_email == undefined ||
+                vend_address == "" || vend_address == null || vend_address == undefined) {
                 response.send(invalidData);
                 return;
             }
@@ -220,20 +239,19 @@ exports.Ws_delete_product = function(request, response) {
     request.getConnection(function(err, connection) {
 
         if (err) {
+            console.log("Error while connecting DB :" + err);
             response.send(error);
             return;
         } else {
-            ObjectDB.delete_product_detail(prod_name, prod_desc, prod_unit, prod_rate, connection, function(callback) {
+            ObjectDB.delete_vendor_details(vend_name, vend_contact, vend_email, vend_address, connection, function(callback) {
                 if (callback) {
-                    data = JSON.stringify(callback);
-
+                    console.log("data is :" + callback)
                     if (callback.affectedRows < 1) {
                         response.send(error);
                         return;
                     } else {
-
                         if (callback.insertId > 0) {
-                            Result = '{"status":200'+',' + '"message" :"Product added successfully."' + '}';
+                            Result = '{"status":200'+',' + '"message" :"Vendor added successfully."' + '}';
                             response.send(Result);
                             return;
                         } else {
@@ -247,5 +265,3 @@ exports.Ws_delete_product = function(request, response) {
         }
     })
 };
-
-
