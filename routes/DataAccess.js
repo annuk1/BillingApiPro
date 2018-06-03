@@ -195,10 +195,8 @@ getData.prototype.get_challans_by_customer_id = function (customerId, connection
     connection.query(sql, function (err, rows) {
         if (err) {
             callback(error);
-            console.log("Get Challans :" + JSON.stringify(error));
         } else {
             callback(rows);
-            console.log("Get Challans :" + JSON.stringify(rows));
         }
     })
 };
@@ -367,7 +365,7 @@ getData.prototype.Ws_get_invoices = function (connection, callback) {
 
 getData.prototype.Ws_set_invoice_detail = function (pur_date, pur_cust_id, connection, callback) {
 
-    var sql = "INSERT INTO purchases VALUES (null,'" + pur_date + "','" + pur_cust_id + "')";
+    var sql = "INSERT INTO invoices VALUES (null,'" + pur_date + "','" + pur_cust_id + "')";
     connection.query(sql, function (err, rows) {
         if (err) {
             callback(error);
@@ -379,7 +377,7 @@ getData.prototype.Ws_set_invoice_detail = function (pur_date, pur_cust_id, conne
 
 getData.prototype.Ws_set_invoice_products = function (prod_id, pur_id, connection, callback) {
 
-    var sql = "INSERT INTO purchase_products VALUES (null,'" + prod_id + "','" + pur_id + "')";
+    var sql = "INSERT INTO invoice_products VALUES (null,'" + prod_id + "','" + pur_id + "')";
     connection.query(sql, function (err, rows) {
         if (err) {
             callback(error);
