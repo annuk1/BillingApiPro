@@ -191,14 +191,12 @@ getData.prototype.set_challan_detail = function (cust_id, prod_id, veh_id, chal_
 
 getData.prototype.get_challans_by_customer_id = function (customerId, connection, callback) {
 
-    var sql = "SELECT * FROM challans WHERE chal_cust_id = '" + customerId + "'";
+    var sql = "SELECT challans.chal_id, challans.chal_date, challans.chal_veh_id, vehicles.veh_number FROM challans, vehicles WHERE challans.chal_veh_id = vehicles.veh_id && chal_cust_id = '" + customerId + "'";
     connection.query(sql, function (err, rows) {
         if (err) {
             callback(error);
-            console.log("Get Challans :" + JSON.stringify(error));
         } else {
             callback(rows);
-            console.log("Get Challans :" + JSON.stringify(rows));
         }
     })
 };
