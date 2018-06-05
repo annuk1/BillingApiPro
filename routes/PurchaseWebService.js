@@ -135,36 +135,6 @@ exports.Ws_set_purchase = function (request, response) {
     })
 };
 
-//This function is used to set quatation product details
-set_purchase_products = function (products, quat_id, connection) {
-    console.log("Inside quatation products");
-    for (var i = 0; i < quat_products.length; i++) {
-        ObjectDB.set_purchase_products(quat_products[i].prod_id, callback.insertId, connection, function (callback) {
-            if (callback) {
-                data = JSON.stringify(callback);
-
-                if (callback.affectedRows < 1) {
-                    response.send(error);
-                    return;
-                } else {
-                    if (callback.insertId > 0) {
-                        if (i == products.length - 1) {
-                            Result = '{"status":200' + ',' + '"message" :"Purchase added successfully."' + '}';
-                            response.send(Result);
-                            return;
-                        }
-                    } else {
-                        Result = failure;
-                        response.send(Result);
-                        return;
-                    }
-                }
-            }
-        });
-    }
-
-};
-
 exports.Ws_get_purchase_products = function (request, response) {
 
     var objutil = require("./Utility.js");

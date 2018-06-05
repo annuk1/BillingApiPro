@@ -18,8 +18,8 @@ getData.prototype.get_customers = function (connection, callback) {
         } else {
             callback(rows);
         }
-    });
-};
+    })
+}
 
 getData.prototype.set_customer_detail = function (cust_name, cust_contact, cust_email, cust_address, connection, callback) {
 
@@ -31,7 +31,7 @@ getData.prototype.set_customer_detail = function (cust_name, cust_contact, cust_
             callback(rows);
         }
     })
-};
+}
 
 getData.prototype.update_customer_detail = function (cust_id, cust_name, cust_contact, cust_email, cust_address, connection, callback) {
 
@@ -43,7 +43,7 @@ getData.prototype.update_customer_detail = function (cust_id, cust_name, cust_co
             callback(rows);
         }
     })
-};
+}
 
 getData.prototype.delete_customer_detail = function (cust_id, cust_name, cust_contact, cust_email, cust_address, connection, callback) {
 
@@ -55,7 +55,8 @@ getData.prototype.delete_customer_detail = function (cust_id, cust_name, cust_co
             callback(rows);
         }
     })
-};
+}
+
 getData.prototype.get_customer_by_id = function (customerId, connection, callback) {
 
     var sql = "SELECT * FROM customers WHERE CUST_ID = '" + customerId + "'";
@@ -66,8 +67,8 @@ getData.prototype.get_customer_by_id = function (customerId, connection, callbac
         } else {
             callback(rows);
         }
-    });
-};
+    })
+}
 
 getData.prototype.get_vendor_details = function (connection, callback) {
 
@@ -79,7 +80,7 @@ getData.prototype.get_vendor_details = function (connection, callback) {
             callback(rows);
         }
     })
-};
+}
 
 getData.prototype.set_vendor_details = function (vend_name, vend_contact, vend_email, vend_address, connection, callback) {
 
@@ -91,7 +92,7 @@ getData.prototype.set_vendor_details = function (vend_name, vend_contact, vend_e
             callback(rows);
         }
     })
-};
+}
 
 getData.prototype.update_vendor_details = function (vend_name, vend_contact, vend_email, vend_address, connection, callback) {
 
@@ -104,6 +105,7 @@ getData.prototype.update_vendor_details = function (vend_name, vend_contact, ven
         }
     })
 };
+
 getData.prototype.delete_vendor_details = function (vend_name, vend_contact, vend_email, vend_address, connection, callback) {
 
     var sql = "INSERT INTO vendors VALUES (null,'" + vend_name + "','" + vend_contact + "','" + vend_email + "','" + vend_address + "')";
@@ -114,7 +116,7 @@ getData.prototype.delete_vendor_details = function (vend_name, vend_contact, ven
             callback(rows);
         }
     })
-};
+}
 
 getData.prototype.get_products = function (connection, callback) {
 
@@ -126,7 +128,7 @@ getData.prototype.get_products = function (connection, callback) {
             callback(rows);
         }
     })
-};
+}
 
 getData.prototype.set_product_detail = function (prod_name, prod_desc, prod_unit, prod_rate, connection, callback) {
 
@@ -138,7 +140,7 @@ getData.prototype.set_product_detail = function (prod_name, prod_desc, prod_unit
             callback(rows);
         }
     })
-};
+}
 
 getData.prototype.update_product_detail = function (prod_name, prod_desc, prod_unit, prod_rate, connection, callback) {
 
@@ -150,7 +152,7 @@ getData.prototype.update_product_detail = function (prod_name, prod_desc, prod_u
             callback(rows);
         }
     })
-};
+}
 
 getData.prototype.delete_product_detail = function (prod_name, prod_desc, prod_unit, prod_rate, connection, callback) {
 
@@ -162,7 +164,7 @@ getData.prototype.delete_product_detail = function (prod_name, prod_desc, prod_u
             callback(rows);
         }
     })
-};
+}
 
 getData.prototype.get_challans = function (connection, callback) {
 
@@ -175,7 +177,7 @@ getData.prototype.get_challans = function (connection, callback) {
             callback(rows);
         }
     })
-};
+}
 
 getData.prototype.set_challan_detail = function (cust_id, prod_id, veh_id, chal_qty, connection, callback) {
 
@@ -187,7 +189,7 @@ getData.prototype.set_challan_detail = function (cust_id, prod_id, veh_id, chal_
             callback(rows);
         }
     })
-};
+}
 
 getData.prototype.get_challans_by_customer_id = function (customerId, connection, callback) {
 
@@ -199,7 +201,7 @@ getData.prototype.get_challans_by_customer_id = function (customerId, connection
             callback(rows);
         }
     })
-};
+}
 
 getData.prototype.get_quatations = function (connection, callback) {
 
@@ -211,7 +213,7 @@ getData.prototype.get_quatations = function (connection, callback) {
             callback(rows);
         }
     })
-};
+}
 
 getData.prototype.set_quatation_detail = function (quat_date, quat_cust_id, quat_products, connection, callback) {
 
@@ -225,45 +227,29 @@ getData.prototype.set_quatation_detail = function (quat_date, quat_cust_id, quat
                 if (error) {
                     return connection.rollback(function () {
                         callback(error);
-
                     })
                 }
-                console.log("result...." + JSON.stringify(result));
+                console.log("quatations: " + result);
                 var quat_id = result.insertId;
-                var pro_arr = quat_products;
-                console.log("pro_arr" + JSON.stringify(pro_arr));
-                for (var i = 0; i < pro_arr.length; i++) {
-                    var prod_id = pro_arr[i].prod_id;
+                for (var i = 0; i < quat_products.length; i++) {
+                    var prod_id = quat_products[i].prod_id;
                     var sql1 = "INSERT INTO quatation_products VALUES (null,'" + prod_id + "','" + quat_id + "')";
                     connection.query(sql1, function (err, rows) {
                         if (err) {
                             return connection.rollback(function () {
                                 callback(error);
-
                             })
                         } else {
                             connection.commit()
-                            console.log("rows.." + JSON.stringify(rows));
+                            console.log("Add quatations: " + rows);
                             callback(rows);
                         }
                     })
                 }
-            });
-        };
-    });
-};
-
-getData.prototype.set_quatation_products = function (prod_id, quat_id, connection, callback) {
-
-    var sql = "INSERT INTO quatation_products VALUES (null,'" + prod_id + "','" + quat_id + "')";
-    connection.query(sql, function (err, rows) {
-        if (err) {
-            callback(error);
-        } else {
-            callback(rows);
+            })
         }
     })
-};
+}
 
 getData.prototype.Ws_get_quatation_products = function (connection, callback) {
 
@@ -275,7 +261,7 @@ getData.prototype.Ws_get_quatation_products = function (connection, callback) {
             callback(rows);
         }
     })
-};
+}
 
 getData.prototype.Ws_get_quatation_products_by_id = function (quat_id, connection, callback) {
 
@@ -287,7 +273,7 @@ getData.prototype.Ws_get_quatation_products_by_id = function (quat_id, connectio
             callback(rows);
         }
     })
-};
+}
 
 // Purchase queries
 getData.prototype.get_purchases = function (connection, callback) {
@@ -300,31 +286,41 @@ getData.prototype.get_purchases = function (connection, callback) {
             callback(rows);
         }
     })
-};
+}
 
-getData.prototype.set_purchase_detail = function (pur_date, pur_cust_id, connection, callback) {
+getData.prototype.set_purchase_detail = function (pur_date, pur_cust_id, pur_products, connection, callback) {
 
-    var sql = "INSERT INTO purchases VALUES (null,'" + pur_date + "','" + pur_cust_id + "')";
-    connection.query(sql, function (err, rows) {
-        if (err) {
+    connection.beginTransaction(function (error) {
+        if (error) {
             callback(error);
-        } else {
-            callback(rows);
+        }
+        else {
+            var sql = "INSERT INTO purchases VALUES (null,'" + pur_date + "','" + pur_cust_id + "')";
+            connection.query(sql, function (error, result) {
+                if (error) {
+                    return connection.rollback(function () {
+                        callback(error);
+                    })
+                }
+                var quat_id = result.insertId;
+                for (var i = 0; i < pur_products.length; i++) {
+                    var prod_id = pur_products[i].prod_id;
+                    var sql1 = "INSERT INTO purchase_products VALUES (null,'" + prod_id + "','" + pur_id + "')";
+                    connection.query(sql1, function (err, rows) {
+                        if (err) {
+                            return connection.rollback(function () {
+                                callback(error);
+                            })
+                        } else {
+                            connection.commit()
+                            callback(rows);
+                        }
+                    })
+                }
+            })
         }
     })
-};
-
-getData.prototype.set_purchase_products = function (prod_id, pur_id, connection, callback) {
-
-    var sql = "INSERT INTO purchase_products VALUES (null,'" + prod_id + "','" + pur_id + "')";
-    connection.query(sql, function (err, rows) {
-        if (err) {
-            callback(error);
-        } else {
-            callback(rows);
-        }
-    })
-};
+}
 
 getData.prototype.Ws_get_purchase_products = function (connection, callback) {
 
@@ -336,7 +332,7 @@ getData.prototype.Ws_get_purchase_products = function (connection, callback) {
             callback(rows);
         }
     })
-};
+}
 
 getData.prototype.Ws_get_purchase_products_by_id = function (pur_id, connection, callback) {
 
@@ -348,7 +344,7 @@ getData.prototype.Ws_get_purchase_products_by_id = function (pur_id, connection,
             callback(rows);
         }
     })
-};
+}
 
 // Get invoice
 getData.prototype.Ws_get_invoices = function (connection, callback) {
@@ -361,11 +357,45 @@ getData.prototype.Ws_get_invoices = function (connection, callback) {
             callback(rows);
         }
     })
-};
+}
 
-getData.prototype.Ws_set_invoice_detail = function (pur_date, pur_cust_id, connection, callback) {
+getData.prototype.Ws_set_invoice_detail = function (inv_date, inv_cust_id, inv_products, connection, callback) {
 
-    var sql = "INSERT INTO invoices VALUES (null,'" + pur_date + "','" + pur_cust_id + "')";
+    connection.beginTransaction(function (error) {
+        if (error) {
+            callback(error);
+        }
+        else {
+            var sql = "INSERT INTO invoices VALUES (null,'" + inv_date + "','" + inv_cust_id + "')";
+            connection.query(sql, function (error, result) {
+                if (error) {
+                    return connection.rollback(function () {
+                        callback(error);
+                    })
+                }
+                var quat_id = result.insertId;
+                for (var i = 0; i < inv_products.length; i++) {
+                    var prod_id = inv_products[i].prod_id;
+                    var sql1 = "INSERT INTO invoice_products VALUES (null,'" + prod_id + "','" + inv_id + "')";
+                    connection.query(sql1, function (err, rows) {
+                        if (err) {
+                            return connection.rollback(function () {
+                                callback(error);
+                            })
+                        } else {
+                            connection.commit()
+                            callback(rows);
+                        }
+                    })
+                }
+            })
+        }
+    })
+}
+
+getData.prototype.Ws_set_invoice_products = function (prod_id, inv_id, connection, callback) {
+
+    var sql = "INSERT INTO invoice_products VALUES (null,'" + prod_id + "','" + inv_id + "')";
     connection.query(sql, function (err, rows) {
         if (err) {
             callback(error);
@@ -373,19 +403,7 @@ getData.prototype.Ws_set_invoice_detail = function (pur_date, pur_cust_id, conne
             callback(rows);
         }
     })
-};
-
-getData.prototype.Ws_set_invoice_products = function (prod_id, pur_id, connection, callback) {
-
-    var sql = "INSERT INTO invoice_products VALUES (null,'" + prod_id + "','" + pur_id + "')";
-    connection.query(sql, function (err, rows) {
-        if (err) {
-            callback(error);
-        } else {
-            callback(rows);
-        }
-    })
-};
+}
 
 getData.prototype.Ws_get_invoice_products_by_id = function (pur_id, connection, callback) {
 
@@ -397,7 +415,7 @@ getData.prototype.Ws_get_invoice_products_by_id = function (pur_id, connection, 
             callback(rows);
         }
     })
-};
+}
 
 getData.prototype.get_vehicles = function (connection, callback) {
 
@@ -409,6 +427,6 @@ getData.prototype.get_vehicles = function (connection, callback) {
             callback(rows);
         }
     })
-};
+}
 
 exports = module.exports = getData;
