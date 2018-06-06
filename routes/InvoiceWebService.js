@@ -11,7 +11,7 @@ var http = require('http');
 var ObjDB = require("./DataAccess.js");
 var ObjectDB = new ObjDB();
 
-exports.Ws_get_invoices = function(request, response) {
+exports.Ws_get_invoices = function (request, response) {
 
     var objutil = require("./Utility.js");
 
@@ -24,7 +24,7 @@ exports.Ws_get_invoices = function(request, response) {
     var Update = objutil.Update;
 
 
-    request.getConnection(function(err, connection) {
+    request.getConnection(function (err, connection) {
 
         if (err) {
             console.log("Error while connecting DB :" + err);
@@ -32,7 +32,7 @@ exports.Ws_get_invoices = function(request, response) {
             return;
         } else {
 
-            ObjectDB.Ws_get_invoices(connection, function(callback) {
+            ObjectDB.Ws_get_invoices(connection, function (callback) {
                 if (callback) {
                     data = callback;
                     var Arr_Temp = data;
@@ -62,7 +62,7 @@ exports.Ws_get_invoices = function(request, response) {
 };
 
 //This web service is use to set customer details .
-exports.Ws_set_invoice = function(request, response) {
+exports.Ws_set_invoice = function (request, response) {
 
     var objutil = require("./Utility.js");
 
@@ -79,24 +79,20 @@ exports.Ws_set_invoice = function(request, response) {
 
     if (request.body.data) {
         try {
-            console.log("Request Parameters" + request);
             var reqJsonString = request.body.data;
-            console.log('Input Parameters :' + JSON.stringify(reqJsonString));
 
+            var inv_date = reqJsonString.inv_date;
+            var cust_id = reqJsonString.inv_cust_id;
+            var inv_total = reqJsonString.inv_total_amount;
+            var inv_products = reqJsonString.inv_products;
 
-            var cust_name = reqJsonString.cust_name;
-            var cust_contact = reqJsonString.cust_contact;
-            var cust_email = reqJsonString.cust_email;
-            var cust_address = reqJsonString.cust_address;
-            if (cust_name == "" || cust_name == null || cust_name == undefined ||
-                cust_contact == "" || cust_contact == null || cust_contact == undefined ||
-                cust_email == "" || cust_email == null || cust_email == undefined ||
-                cust_address == "" || cust_address == null || cust_address == undefined) {
+            if (inv_date == "" || inv_date == null || inv_date == undefined ||
+                cust_id == "" || cust_id == null || cust_id == undefined ||
+                inv_total == "" || inv_total == null || inv_total == undefined ||
+                inv_products == null || inv_products == undefined) {
                 response.send(invalidData);
                 return;
             }
-
-
         } catch (err) {
             var errMessage = err.message;
             console.log("Error in data :" + errMessage);
@@ -104,34 +100,25 @@ exports.Ws_set_invoice = function(request, response) {
             return;
         }
     }
-    request.getConnection(function(err, connection) {
+    request.getConnection(function (err, connection) {
 
         if (err) {
             console.log("Error while connecting DB :" + err);
             response.send(error);
             return;
         } else {
-            ObjectDB.set_customer_detail(cust_name, cust_contact, cust_email, cust_address, connection, function(callback) {
+            ObjectDB.Ws_set_invoice_detail(inv_date, cust_id, inv_total, inv_products, connection, function (callback) {
                 if (callback) {
                     console.log("data is :" + JSON.stringify(callback));
                     data = JSON.stringify(callback);
-
                     if (callback.affectedRows < 1) {
                         response.send(error);
                         return;
                     } else {
-
                         if (callback.insertId > 0) {
-
-                            Result = '{"data" : ' + JSON.stringify(callback) + '}';
-                            Result = Result.substring(0, Result.length - 1);
-                            Result = Result + ',' + '"status":200';
-                            Result = Result + ',' + '"message" :"success"' + '}';
-
+                            Result = '{"status":200' + ',' + '"message" :"Invoice added successfully."' + '}';
                             response.send(Result);
                             return;
-
-
                         } else {
                             Result = failure;
                             response.send(Result);

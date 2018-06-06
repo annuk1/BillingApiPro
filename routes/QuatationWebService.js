@@ -105,7 +105,6 @@ exports.Ws_set_quatation = function (request, response) {
             ObjectDB.set_quatation_detail(quat_date, quat_cust_id, quat_products, connection, function (callback) {
                 if (callback) {
                     data = JSON.stringify(callback);
-                    console.log("input data :" + data);
 
                     if (callback.affectedRows < 1) {
                         response.send(error);

@@ -77,13 +77,15 @@ exports.Ws_set_purchase = function (request, response) {
     if (request.body.data) {
         try {
             var reqJsonString = request.body.data;
+            console.log("Input " + JSON.stringify(reqJsonString));
+            var pur_date = reqJsonString.pur_date;
+            var pur_total_amount = reqJsonString.pur_total_amount;
+            var pur_vend_id = reqJsonString.pur_vendor_id;
+            var pur_products = reqJsonString.pur_products;
 
-            var quat_date = reqJsonString.quat_date;
-            var quat_cust_id = reqJsonString.quat_cust_id;
-            var quat_products = reqJsonString.quat_products;
-
-            if (quat_date == "" || quat_date == null || quat_date == undefined ||
-                quat_cust_id == "" || quat_cust_id == null || quat_cust_id == undefined) {
+            if (pur_date == "" || pur_date == null || pur_date == undefined ||
+                pur_total_amount == "" || pur_total_amount == null || pur_total_amount == undefined ||
+                pur_vend_id == "" || pur_vend_id == null || pur_vend_id == undefined) {
                 response.send(invalidData);
                 return;
             }
@@ -102,7 +104,7 @@ exports.Ws_set_purchase = function (request, response) {
             response.send(error);
             return;
         } else {
-            ObjectDB.set_purchase_detail(quat_date, quat_cust_id, connection, function (callback) {
+            ObjectDB.set_purchase_detail(pur_date, pur_total_amount, pur_vend_id,pur_products, connection, function (callback) {
                 if (callback) {
                     data = JSON.stringify(callback);
 
@@ -111,17 +113,8 @@ exports.Ws_set_purchase = function (request, response) {
                         return;
                     } else {
                         if (callback.insertId > 0) {
-                            for (var i = 0; i < quat_products.length; i++) {
-
-                                var sql = "INSERT INTO purchase_products VALUES (null,'" + quat_products[0].prod_id + "','" + callback.insertId + "')";
-                                connection.query(sql, function (err, rows) {
-                                    if (err) {
-                                        console.log(error);
-                                    } else {
-                                        console.log(rows);
-                                    }
-                                })
-                            }
+                            Result = '{"status":200' + ',' + '"message" :"Purchase added successfully."' + '}';
+                            response.send(Result);
                             return;
                         } else {
                             Result = failure;

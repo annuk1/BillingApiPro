@@ -278,7 +278,7 @@ getData.prototype.Ws_get_quatation_products_by_id = function (quat_id, connectio
 // Purchase queries
 getData.prototype.get_purchases = function (connection, callback) {
 
-    var sql = "select purchases.pur_id, purchases.pur_date, vendors.vend_name AS pur_vendor, vendors.vend_address AS pur_address, vendors.vend_contact AS pur_contact, vendors.vend_contact_person AS pur_contact_person from vendors, purchases where vendors.vend_id=purchases.pur_vendor_id";
+    var sql = "select purchases.pur_id, purchases.pur_date, vendors.vend_id AS pur_vend_id, vendors.vend_name AS pur_vendor, vendors.vend_address AS pur_address, vendors.vend_contact AS pur_contact, vendors.vend_contact_person AS pur_contact_person from vendors, purchases where vendors.vend_id=purchases.pur_vendor_id";
     connection.query(sql, function (err, rows) {
         if (err) {
             callback(error);
@@ -288,24 +288,25 @@ getData.prototype.get_purchases = function (connection, callback) {
     })
 }
 
-getData.prototype.set_purchase_detail = function (pur_date, pur_cust_id, pur_products, connection, callback) {
-
+getData.prototype.set_purchase_detail = function (pur_date, pur_total_amount, pur_vend_id, pur_products, connection, callback) {
     connection.beginTransaction(function (error) {
         if (error) {
             callback(error);
-        }
-        else {
-            var sql = "INSERT INTO purchases VALUES (null,'" + pur_date + "','" + pur_cust_id + "')";
+        } else {
+            var sql = "INSERT INTO purchases VALUES (null,'" + pur_date + "','" + pur_total_amount + "','" + pur_vend_id + "')";
             connection.query(sql, function (error, result) {
                 if (error) {
                     return connection.rollback(function () {
                         callback(error);
                     })
                 }
-                var quat_id = result.insertId;
+                var pur_id = result.insertId;
                 for (var i = 0; i < pur_products.length; i++) {
                     var prod_id = pur_products[i].prod_id;
-                    var sql1 = "INSERT INTO purchase_products VALUES (null,'" + prod_id + "','" + pur_id + "')";
+                    var prod_rate = pur_products[i].prod_rate;
+                    var prod_qty = pur_products[i].prod_qty;
+                    var prod_total = pur_products[i].prod_total;
+                    var sql1 = "INSERT INTO purchase_products VALUES (null,'" + prod_id + "','" + prod_rate + "','" + prod_qty + "','" + pur_id + "','" + prod_total + "')";
                     connection.query(sql1, function (err, rows) {
                         if (err) {
                             return connection.rollback(function () {
@@ -336,7 +337,7 @@ getData.prototype.Ws_get_purchase_products = function (connection, callback) {
 
 getData.prototype.Ws_get_purchase_products_by_id = function (pur_id, connection, callback) {
 
-    var sql = "SELECT challans.chal_id, challans.chal_date, challans.chal_quantity AS prod_qty, challans.chal_veh_id AS veh_id, vehicles.veh_number, challans.chal_prod_id AS prod_id, products.prod_name, products.prod_unit, products.prod_rate FROM challans, vehicles, products, purchase_products WHERE products.prod_id = purchase_products.prod_id && challans.chal_prod_id = products.prod_id && challans.chal_veh_id = vehicles.veh_id && pur_id =  '" + pur_id + "'";
+    var sql = "SELECT products.prod_name, products.prod_unit, purchase_products.pur_prod_rate AS prod_rate, purchase_products.pur_prod_qty AS prod_qty, purchase_products.pur_prod_total AS prod_total FROM products, purchase_products WHERE products.prod_id = purchase_products.prod_id && pur_id = '" + pur_id + "'";
     connection.query(sql, function (err, rows) {
         if (err) {
             callback(error);
@@ -359,24 +360,31 @@ getData.prototype.Ws_get_invoices = function (connection, callback) {
     })
 }
 
-getData.prototype.Ws_set_invoice_detail = function (inv_date, inv_cust_id, inv_products, connection, callback) {
+getData.prototype.Ws_set_invoice_detail = function (inv_date, inv_cust_id, inv_total, inv_products, connection, callback) {
 
     connection.beginTransaction(function (error) {
         if (error) {
             callback(error);
         }
         else {
-            var sql = "INSERT INTO invoices VALUES (null,'" + inv_date + "','" + inv_cust_id + "')";
+            var sql = "INSERT INTO invoices VALUES (null,'" + inv_date + "','" + inv_cust_id + "','" + inv_total + "')";
+            console.log("sql " + sql);
+
             connection.query(sql, function (error, result) {
                 if (error) {
                     return connection.rollback(function () {
                         callback(error);
                     })
                 }
-                var quat_id = result.insertId;
+                var inv_id = result.insertId;
                 for (var i = 0; i < inv_products.length; i++) {
                     var prod_id = inv_products[i].prod_id;
-                    var sql1 = "INSERT INTO invoice_products VALUES (null,'" + prod_id + "','" + inv_id + "')";
+                    var chal_id = inv_products[i].chal_id;
+                    var prod_qty = inv_products[i].prod_qty;
+                    var prod_total = inv_products[i].prod_total_amount;
+
+                    var sql1 = "INSERT INTO invoice_products VALUES (null,'" + prod_id + "','" + prod_qty + "','" + inv_id + "','" + chal_id + "','" + prod_total + "')";
+                    console.log("sql1 " + sql1);
                     connection.query(sql1, function (err, rows) {
                         if (err) {
                             return connection.rollback(function () {
