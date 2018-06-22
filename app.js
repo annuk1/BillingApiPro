@@ -70,32 +70,39 @@ var Wscall_Quatation = require('./routes/QuatationWebService.js');
 var Wscall_Purchase = require('./routes/PurchaseWebService.js');
 var Wscall_Invoice = require('./routes/InvoiceWebService.js');
 var Wscall_Vehicle = require('./routes/VehicleWebService.js');
+var Wscall_GST = require('./routes/GSTWebService.js');
 
+// Customer web services
 app.post('/getCustomers', Wscall_Customer.Ws_get_customers);
+app.post('/getCustomerById', Wscall_Customer.Ws_get_customer_by_id);
 app.post('/addCustomer', Wscall_Customer.Ws_set_customer);
 app.post('/updateCustomer', Wscall_Customer.Ws_update_customer);
 app.post('/deleteCustomer', Wscall_Customer.Ws_delete_customer);
 
 // Vendor web services
 app.post('/getVendors', Wscall_Vendor.Ws_get_vendors);
+app.post('/getVendorById', Wscall_Vendor.Ws_get_vendor_by_id);
 app.post('/addVendor', Wscall_Vendor.Ws_set_vendor);
 app.post('/updateVendor', Wscall_Vendor.Ws_update_vendor);
 app.post('/deleteVendor', Wscall_Vendor.Ws_delete_vendor);
 
 // Products web services
 app.post('/getProducts', Wscall_Product.Ws_get_products);
+app.post('/getProductById', Wscall_Product.Ws_get_products_by_id);
 app.post('/addProduct', Wscall_Product.Ws_set_product);
 app.post('/updateProduct', Wscall_Product.Ws_update_product);
 app.post('/deleteProduct', Wscall_Product.Ws_delete_product);
 
+// Challan web services
 app.post('/getChallans', Wscall_Challan.Ws_get_challans);
 app.post('/addChallan', Wscall_Challan.Ws_set_challan);
 app.post('/getChallansByCustomerId', Wscall_Challan.Ws_get_challans_by_customer_id);
 
+// Quatation web services
 app.post('/getQuatations', Wscall_Quatation.Ws_get_quatations);
 app.post('/addQuatation', Wscall_Quatation.Ws_set_quatation);
 app.post('/getQuatationProductsById', Wscall_Quatation.Ws_get_quatation_products_by_id);
-app.post('/getQuatationCustomer', Wscall_Quatation.Ws_get_quatation_products);
+// app.post('/getQuatationCustomer', Wscall_Quatation.Ws_get_quatation_products);
 
 // Invoice web services
 app.post('/getInvoices', Wscall_Invoice.Ws_get_invoices);
@@ -109,6 +116,17 @@ app.post('/getPurchaseProductsById', Wscall_Purchase.Ws_get_purchase_products_by
 
 // Vehicle web services
 app.post('/getVehicles', Wscall_Vehicle.Ws_get_vehicles);
+app.post('/getVehicleById', Wscall_Vehicle.Ws_get_vehicle_by_id);
+app.post('/addVehicle', Wscall_Vehicle.Ws_set_vehicle);
+app.post('/updateVehicle', Wscall_Vehicle.Ws_update_vehicle);
+app.post('/deleteVehicle', Wscall_Vehicle.Ws_delete_vehicle);
+
+// GST web services
+app.post('/getGSTDetails', Wscall_GST.Ws_get_gst_details);
+app.post('/getGSTDetailById', Wscall_GST.Ws_get_gst_detail_by_id);
+app.post('/addGSTDetail', Wscall_GST.Ws_set_gst_detail);
+app.post('/updateGSTDetail', Wscall_GST.Ws_update_gst_detail);
+app.post('/deleteGSTDetail', Wscall_GST.Ws_delete_gst_detail);
 
 var port = process.env.PORT || 3000;
 app.listen(port);

@@ -75,7 +75,7 @@ exports.Ws_set_invoice = function (request, response) {
     var Update = objutil.Update;
 
 
-    var reqJsonObj, reqJsonString, lastupdateddatetime, p_username;
+    var reqJsonString;
 
     if (request.body.data) {
         try {
@@ -109,7 +109,6 @@ exports.Ws_set_invoice = function (request, response) {
         } else {
             ObjectDB.Ws_set_invoice_detail(inv_date, cust_id, inv_total, inv_products, connection, function (callback) {
                 if (callback) {
-                    console.log("data is :" + JSON.stringify(callback));
                     data = JSON.stringify(callback);
                     if (callback.affectedRows < 1) {
                         response.send(error);
@@ -146,16 +145,13 @@ exports.Ws_get_invoice_products_by_id = function (request, response) {
     if (request.body.data) {
         try {
             var reqJsonString = request.body.data;
-
-            var pur_id = reqJsonString.pur_id;
-            console.log("Get Invoice Products :" + pur_id);
-            if (pur_id == "" || pur_id == null || pur_id == undefined) {
+            var inv_id = reqJsonString.inv_id;
+            if (inv_id == "" || inv_id == null || inv_id == undefined) {
                 response.send(invalidData);
                 return;
             }
         } catch (err) {
             var errMessage = err.message;
-            console.log("Error in data :" + errMessage);
             response.send(error);
 
             return;
@@ -165,16 +161,14 @@ exports.Ws_get_invoice_products_by_id = function (request, response) {
     request.getConnection(function (err, connection) {
 
         if (err) {
-            console.log("Error while connecting DB :" + err);
             response.send(error);
             return;
         } else {
-            ObjectDB.Ws_get_invoice_products_by_id(pur_id, connection, function (callback) {
+            ObjectDB.Ws_get_invoice_products_by_id(inv_id, connection, function (callback) {
                 if (callback) {
                     data = callback;
                     var Arr_Temp = data;
                     var newsubstr = JSON.stringify(Arr_Temp);
-                    console.log("Get Invoice Products :" + newsubstr);
 
                     if (newsubstr.indexOf("status") > -1 && newsubstr.indexOf("500") > -1 && newsubstr.indexOf("Internal server error") > -1) {
                         response.send(error);

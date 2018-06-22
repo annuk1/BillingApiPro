@@ -57,7 +57,67 @@ exports.Ws_get_vehicles = function (request, response) {
             });
         }
     })
-};
+}
+
+exports.Ws_get_vehicle_by_id = function (request, response) {
+    var objutil = require("./Utility.js");
+
+    var outPutData = "";
+    var success = objutil.Save;
+    var failure = objutil.Failure;
+    var invalidData = objutil.invalidData;
+    var delete1 = objutil.delete1;
+    var error = objutil.error;
+    var Update = objutil.Update;
+
+    if (request.body.data) {
+        try {
+            var reqJsonString = request.body.data;
+            var veh_id = reqJsonString.veh_id;
+            if (veh_id == "" || veh_id == null || veh_id == undefined) {
+                response.send(invalidData);
+                return;
+            }
+        } catch (err) {
+            var errMessage = err.message;
+            console.log("Error in data :" + errMessage);
+            response.send(error);
+            return;
+        }
+    }
+
+    request.getConnection(function (err, connection) {
+
+        if (err) {
+            console.log("Error while connecting DB :" + err);
+            response.send(error);
+            return;
+        } else {
+            ObjectDB.get_vehicle_by_id(veh_id, connection, function (callback) {
+                if (callback) {
+                    var newsubstr = JSON.stringify(callback);
+                    if (newsubstr.indexOf("status") > -1 && newsubstr.indexOf("500") > -1 && newsubstr.indexOf("Internal server error") > -1) {
+                        response.send(error);
+                        return;
+                    } else {
+                        if (callback.length > 0) {
+                            Result = '{"vehicles" : ' + JSON.stringify(callback) + '}';
+                            Result = Result.substring(0, Result.length - 1);
+                            Result = Result + ',' + '"status":200';
+                            Result = Result + ',' + '"message" :"success"' + '}';
+                            response.send(Result);
+                            return;
+                        } else {
+                            Result = failure;
+                            response.send(Result);
+                            return;
+                        }
+                    }
+                }
+            });
+        }
+    })
+}
 
 //This web service is used to set customer details
 exports.Ws_set_vehicle = function (request, response) {
@@ -75,18 +135,17 @@ exports.Ws_set_vehicle = function (request, response) {
     if (request.body.data) {
         try {
             var reqJsonString = request.body.data;
-
             var veh_name = reqJsonString.veh_name;
             var veh_number = reqJsonString.veh_number;
-
+            var veh_desc = reqJsonString.veh_desc;
             if (veh_name == "" || veh_name == null || veh_name == undefined ||
-                veh_number == "" || veh_number == null || veh_number == undefined) {
+                veh_number == "" || veh_number == null || veh_number == undefined
+                || veh_desc == null || veh_desc == undefined) {
                 response.send(invalidData);
                 return;
             }
         } catch (err) {
             var errMessage = err.message;
-            console.log("Error in data :" + errMessage);
             response.send(error);
             return;
         }
@@ -98,7 +157,7 @@ exports.Ws_set_vehicle = function (request, response) {
             response.send(error);
             return;
         } else {
-            ObjectDB.set_vehicle_detail(veh_name, veh_number, connection, function (callback) {
+            ObjectDB.set_vehicle_detail(veh_name, veh_number, veh_desc, connection, function (callback) {
                 if (callback) {
                     data = JSON.stringify(callback);
 
@@ -139,19 +198,20 @@ exports.Ws_update_vehicle = function (request, response) {
     if (request.body.data) {
         try {
             var reqJsonString = request.body.data;
-            var cust_id = reqJsonString.cust_id;
+            var veh_id = reqJsonString.veh_id;
             var veh_name = reqJsonString.veh_name;
-            var veh_name = reqJsonString.veh_name;
+            var veh_number = reqJsonString.veh_number;
+            var veh_desc = reqJsonString.veh_desc;
 
             if (veh_id == "" || veh_id == null || veh_id == undefined ||
                 veh_name == "" || veh_name == null || veh_name == undefined ||
-                veh_number == "" || veh_number == null || veh_number == undefined) {
+                veh_number == "" || veh_number == null || veh_number == undefined
+                || veh_desc == null || veh_desc == undefined) {
                 response.send(invalidData);
                 return;
             }
         } catch (err) {
             var errMessage = err.message;
-            console.log("Error in data :" + errMessage);
             response.send(error);
             return;
         }
@@ -163,7 +223,7 @@ exports.Ws_update_vehicle = function (request, response) {
             response.send(error);
             return;
         } else {
-            ObjectDB.update_vehicle_detail(veh_id, veh_name, veh_number, connection, function (callback) {
+            ObjectDB.update_vehicle_detail(veh_id, veh_name, veh_number, veh_desc, connection, function (callback) {
                 if (callback) {
                     data = JSON.stringify(callback);
 
@@ -171,7 +231,7 @@ exports.Ws_update_vehicle = function (request, response) {
                         response.send(error);
                         return;
                     } else {
-                        if (callback.insertId > 0) {
+                        if (callback.affectedRows > 0) {
                             Result = '{"status":200' + ',' + '"message" :"Vehicle updated successfully."' + '}';
                             response.send(Result);
                             return;
@@ -204,11 +264,7 @@ exports.Ws_delete_vehicle = function (request, response) {
         try {
             var reqJsonString = request.body.data;
             var veh_id = reqJsonString.veh_id;
-            var veh_name = reqJsonString.veh_name;
-            var veh_number = reqJsonString.veh_number;
-            if (veh_id == "" || veh_id == null || veh_id == undefined ||
-                veh_name == "" || veh_name == null || veh_name == undefined ||
-                veh_number == "" || veh_number == null || veh_number == undefined) {
+            if (veh_id == "" || veh_id == null || veh_id == undefined ) {
                 response.send(invalidData);
                 return;
             }
@@ -226,7 +282,7 @@ exports.Ws_delete_vehicle = function (request, response) {
             response.send(error);
             return;
         } else {
-            ObjectDB.delete_vehicle_detail(veh_id, veh_name, veh_number, connection, function (callback) {
+            ObjectDB.delete_vehicle_detail(veh_id, connection, function (callback) {
                 if (callback) {
                     data = JSON.stringify(callback);
 
@@ -234,7 +290,7 @@ exports.Ws_delete_vehicle = function (request, response) {
                         response.send(error);
                         return;
                     } else {
-                        if (callback.insertId > 0) {
+                        if (callback.affectedRows > 0) {
                             Result = '{"status":200' + ',' + '"message" :"Vehicle deleted successfully."' + '}';
                             response.send(Result);
                             return;
