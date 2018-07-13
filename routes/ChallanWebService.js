@@ -31,15 +31,76 @@ exports.Ws_get_challans = function (request, response) {
         } else {
             ObjectDB.get_challans(connection, function (callback) {
                 if (callback) {
-                    data = callback;
-                    var Arr_Temp = data;
-                    var newsubstr = JSON.stringify(Arr_Temp);
+                    var newsubstr = JSON.stringify(callback);
                     if (newsubstr.indexOf("status") > -1 && newsubstr.indexOf("500") > -1 && newsubstr.indexOf("Internal server error") > -1) {
                         response.send(error);
                         return;
                     } else {
-                        if (data.length > 0) {
-                            Result = '{"challans" : ' + JSON.stringify(data) + '}';
+                        if (newsubstr.length > 0) {
+                            Result = '{"challans" : ' + JSON.stringify(callback) + '}';
+                            Result = Result.substring(0, Result.length - 1);
+                            Result = Result + ',' + '"status":200';
+                            Result = Result + ',' + '"message" :"success"' + '}';
+
+                            response.send(Result);
+                            return;
+                        } else {
+                            Result = failure;
+                            response.send(Result);
+                            return;
+                        }
+                    }
+                }
+            })
+        }
+    })
+}
+
+exports.Ws_get_challan_by_id = function (request, response) {
+
+    var objutil = require("./Utility.js");
+
+    var outPutData = "";
+    var success = objutil.Save;
+    var failure = objutil.Failure;
+    var invalidData = objutil.invalidData;
+    var delete1 = objutil.delete1;
+    var error = objutil.error;
+    var Update = objutil.Update;
+
+    if (request.body.data) {
+        try {
+            var reqJsonString = request.body.data;
+            var challanId = reqJsonString.chal_id;
+
+            if (challanId == "" || challanId == null || challanId == undefined) {
+                response.send(invalidData);
+                return;
+            }
+        } catch (err) {
+            var errMessage = err.message;
+            response.send(error);
+            return;
+        }
+    }
+
+    request.getConnection(function (err, connection) {
+
+        if (err) {
+            console.log("Error while connecting DB :" + err);
+            response.send(error);
+            return;
+        } else {
+            ObjectDB.get_challan_by_id(challanId, connection, function (callback) {
+                if (callback) {
+                    var newsubstr = JSON.stringify(callback);
+
+                    if (newsubstr.indexOf("status") > -1 && newsubstr.indexOf("500") > -1 && newsubstr.indexOf("Internal server error") > -1) {
+                        response.send(error);
+                        return;
+                    } else {
+                        if (newsubstr.length > 0) {
+                            Result = '{"challans" : ' + JSON.stringify(callback) + '}';
                             Result = Result.substring(0, Result.length - 1);
                             Result = Result + ',' + '"status":200';
                             Result = Result + ',' + '"message" :"success"' + '}';
@@ -71,20 +132,16 @@ exports.Ws_set_challan = function (request, response) {
     var error = objutil.error;
     var Update = objutil.Update;
 
-
-    var reqJsonObj, reqJsonString, lastupdateddatetime, p_username;
-
     if (request.body.data) {
         try {
-            console.log("Request Parameters" + request);
             var reqJsonString = request.body.data;
-            console.log('Input Parameters :' + JSON.stringify(reqJsonString));
-
+            var chal_date = reqJsonString.chal_date;
             var cust_id = reqJsonString.chal_cust_id;
             var prod_id = reqJsonString.chal_prod_id;
             var veh_id = reqJsonString.chal_veh_id;
             var chal_qty = reqJsonString.chal_quantity;
-            if (cust_id == "" || cust_id == null || cust_id == undefined ||
+            if (chal_date == "" || chal_date == null || chal_date == undefined ||
+                cust_id == "" || cust_id == null || cust_id == undefined ||
                 prod_id == "" || prod_id == null || prod_id == undefined ||
                 veh_id == "" || veh_id == null || veh_id == undefined ||
                 chal_qty == "" || chal_qty == null || chal_qty == undefined) {
@@ -105,7 +162,7 @@ exports.Ws_set_challan = function (request, response) {
             response.send(error);
             return;
         } else {
-            ObjectDB.set_challan_detail(cust_id, prod_id, veh_id, chal_qty, connection, function (callback) {
+            ObjectDB.set_challan_detail(chal_date, cust_id, prod_id, veh_id, chal_qty, connection, function (callback) {
                 if (callback) {
                     data = JSON.stringify(callback);
 
@@ -115,7 +172,6 @@ exports.Ws_set_challan = function (request, response) {
                     } else {
                         if (callback.insertId > 0) {
                             Result = '{"status":200' + ',' + '"message" :"Challan added successfully."' + '}';
-
                             response.send(Result);
                             return;
                         } else {
@@ -170,16 +226,14 @@ exports.Ws_get_challans_by_customer_id = function (request, response) {
         } else {
             ObjectDB.get_challans_by_customer_id(customerId, connection, function (callback) {
                 if (callback) {
-                    data = callback;
-                    var Arr_Temp = data;
-                    var newsubstr = JSON.stringify(Arr_Temp);
+                    var newsubstr = JSON.stringify(callback);
 
                     if (newsubstr.indexOf("status") > -1 && newsubstr.indexOf("500") > -1 && newsubstr.indexOf("Internal server error") > -1) {
                         response.send(error);
                         return;
                     } else {
                         if (data.length > 0) {
-                            Result = '{"challans" : ' + JSON.stringify(data) + '}';
+                            Result = '{"challans" : ' + JSON.stringify(callback) + '}';
                             Result = Result.substring(0, Result.length - 1);
                             Result = Result + ',' + '"status":200';
                             Result = Result + ',' + '"message" :"success"' + '}';
@@ -193,7 +247,7 @@ exports.Ws_get_challans_by_customer_id = function (request, response) {
                         }
                     }
                 }
-            });
+            })
         }
     })
-};
+}

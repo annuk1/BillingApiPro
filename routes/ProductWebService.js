@@ -65,7 +65,6 @@ exports.Ws_get_products_by_id = function (request, response) {
     if (request.body.data) {
         try {
             var reqJsonString = request.body.data;
-            console.log("Request "+reqJsonString);
             var prod_id = reqJsonString.prod_id;
             if (prod_id == "" || prod_id == null || prod_id == undefined ) {
                 response.send(invalidData);

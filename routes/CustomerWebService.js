@@ -32,16 +32,14 @@ exports.Ws_get_customers = function (request, response) {
         } else {
             ObjectDB.get_customers(connection, function (callback) {
                 if (callback) {
-                    data = callback;
-                    var Arr_Temp = data;
-                    var newsubstr = JSON.stringify(Arr_Temp);
+                    var newsubstr = JSON.stringify(callback);
 
                     if (newsubstr.indexOf("status") > -1 && newsubstr.indexOf("500") > -1 && newsubstr.indexOf("Internal server error") > -1) {
                         response.send(error);
                         return;
                     } else {
-                        if (data.length > 0) {
-                            Result = '{"customers" : ' + JSON.stringify(data) + '}';
+                        if (newsubstr.length > 0) {
+                            Result = '{"customers" : ' + JSON.stringify(callback) + '}';
                             Result = Result.substring(0, Result.length - 1);
                             Result = Result + ',' + '"status":200';
                             Result = Result + ',' + '"message" :"success"' + '}';

@@ -71,6 +71,8 @@ var Wscall_Purchase = require('./routes/PurchaseWebService.js');
 var Wscall_Invoice = require('./routes/InvoiceWebService.js');
 var Wscall_Vehicle = require('./routes/VehicleWebService.js');
 var Wscall_GST = require('./routes/GSTWebService.js');
+var Wscall_Cheque = require('./routes/ChequeWebService.js');
+
 
 // Customer web services
 app.post('/getCustomers', Wscall_Customer.Ws_get_customers);
@@ -97,22 +99,25 @@ app.post('/deleteProduct', Wscall_Product.Ws_delete_product);
 app.post('/getChallans', Wscall_Challan.Ws_get_challans);
 app.post('/addChallan', Wscall_Challan.Ws_set_challan);
 app.post('/getChallansByCustomerId', Wscall_Challan.Ws_get_challans_by_customer_id);
+app.post('/getChallanById', Wscall_Challan.Ws_get_challan_by_id);
 
 // Quatation web services
 app.post('/getQuatations', Wscall_Quatation.Ws_get_quatations);
 app.post('/addQuatation', Wscall_Quatation.Ws_set_quatation);
 app.post('/getQuatationProductsById', Wscall_Quatation.Ws_get_quatation_products_by_id);
-// app.post('/getQuatationCustomer', Wscall_Quatation.Ws_get_quatation_products);
+app.post('/getQuatationById', Wscall_Quatation.Ws_get_quatation_by_id);
 
 // Invoice web services
 app.post('/getInvoices', Wscall_Invoice.Ws_get_invoices);
 app.post('/addInvoice', Wscall_Invoice.Ws_set_invoice);
 app.post('/getInvoiceProductsById', Wscall_Invoice.Ws_get_invoice_products_by_id);
+app.post('/getInvoiceById', Wscall_Invoice.Ws_get_invoice_by_id);
 
 // Purchase web services
 app.post('/getPurchases', Wscall_Purchase.Ws_get_purchases);
 app.post('/addPurchase', Wscall_Purchase.Ws_set_purchase);
 app.post('/getPurchaseProductsById', Wscall_Purchase.Ws_get_purchase_products_by_id);
+app.post('/getPurchaseById', Wscall_Purchase.Ws_get_purchase_by_id);
 
 // Vehicle web services
 app.post('/getVehicles', Wscall_Vehicle.Ws_get_vehicles);
@@ -127,6 +132,13 @@ app.post('/getGSTDetailById', Wscall_GST.Ws_get_gst_detail_by_id);
 app.post('/addGSTDetail', Wscall_GST.Ws_set_gst_detail);
 app.post('/updateGSTDetail', Wscall_GST.Ws_update_gst_detail);
 app.post('/deleteGSTDetail', Wscall_GST.Ws_delete_gst_detail);
+
+// Cheque Entry web services
+app.post('/getChequeEntries', Wscall_Cheque.Ws_get_cheque_entries);
+app.post('/getChequeEntryById', Wscall_Cheque.Ws_get_cheque_entry_by_id);
+app.post('/addChequeEntry', Wscall_Cheque.Ws_set_cheque_entry);
+app.post('/updateChequeEntry', Wscall_Cheque.Ws_update_cheque_entry);
+app.post('/deleteChequeEntry', Wscall_Cheque.Ws_delete_cheque_entry);
 
 var port = process.env.PORT || 3000;
 app.listen(port);

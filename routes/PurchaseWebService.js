@@ -59,7 +59,74 @@ exports.Ws_get_purchases = function (request, response) {
             });
         }
     })
-};
+}
+
+exports.Ws_get_purchase_by_id = function (request, response) {
+
+    var objutil = require("./Utility.js");
+
+    var outPutData = "";
+    var success = objutil.Save;
+    var failure = objutil.Failure;
+    var invalidData = objutil.invalidData;
+    var delete1 = objutil.delete1;
+    var error = objutil.error;
+    var Update = objutil.Update;
+
+    if (request.body.data) {
+        try {
+            var reqJsonString = request.body.data;
+            var pur_id = reqJsonString.pur_id;
+
+            if (pur_id == "" || pur_id == null || pur_id == undefined) {
+                response.send(invalidData);
+                return;
+            }
+        } catch (err) {
+            var errMessage = err.message;
+            console.log("Error in data :" + errMessage);
+            response.send(error);
+
+            return;
+        }
+    }
+
+    request.getConnection(function (err, connection) {
+
+        if (err) {
+            console.log("Error while connecting DB :" + err);
+            response.send(error);
+            return;
+        } else {
+            ObjectDB.get_purchase_by_id(pur_id, connection, function (callback) {
+                if (callback) {
+                    data = callback;
+                    var Arr_Temp = data;
+                    var newsubstr = JSON.stringify(Arr_Temp);
+
+                    if (newsubstr.indexOf("status") > -1 && newsubstr.indexOf("500") > -1 && newsubstr.indexOf("Internal server error") > -1) {
+                        response.send(error);
+                        return;
+                    } else {
+                        if (data.length > 0) {
+                            Result = '{"purchases" : ' + JSON.stringify(data) + '}';
+                            Result = Result.substring(0, Result.length - 1);
+                            Result = Result + ',' + '"status":200';
+                            Result = Result + ',' + '"message" :"success"' + '}';
+
+                            response.send(Result);
+                            return;
+                        } else {
+                            Result = failure;
+                            response.send(Result);
+                            return;
+                        }
+                    }
+                }
+            })
+        }
+    })
+}
 
 //This web service is used to set quatation details
 exports.Ws_set_purchase = function (request, response) {

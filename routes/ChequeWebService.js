@@ -1,4 +1,3 @@
-//Declaration
 var express = require("express");
 var app = express();
 var bodyParser = require("body-parser");
@@ -11,7 +10,7 @@ var http = require('http');
 var ObjDB = require("./DataAccess.js");
 var ObjectDB = new ObjDB();
 
-exports.Ws_get_quatations = function (request, response) {
+exports.Ws_get_cheque_entries = function (request, response) {
 
     var objutil = require("./Utility.js");
 
@@ -31,18 +30,16 @@ exports.Ws_get_quatations = function (request, response) {
             response.send(error);
             return;
         } else {
-            ObjectDB.get_quatations(connection, function (callback) {
+            ObjectDB.get_cheque_entries(connection, function (callback) {
                 if (callback) {
-                    data = callback;
-                    var Arr_Temp = data;
-                    var newsubstr = JSON.stringify(Arr_Temp);
+                    var newsubstr = JSON.stringify(callback);
 
                     if (newsubstr.indexOf("status") > -1 && newsubstr.indexOf("500") > -1 && newsubstr.indexOf("Internal server error") > -1) {
                         response.send(error);
                         return;
                     } else {
-                        if (data.length > 0) {
-                            Result = '{"quatations" : ' + JSON.stringify(data) + '}';
+                        if (newsubstr.length > 0) {
+                            Result = '{"chequeEntries" : ' + JSON.stringify(callback) + '}';
                             Result = Result.substring(0, Result.length - 1);
                             Result = Result + ',' + '"status":200';
                             Result = Result + ',' + '"message" :"success"' + '}';
@@ -61,8 +58,7 @@ exports.Ws_get_quatations = function (request, response) {
     })
 }
 
-exports.Ws_get_quatation_by_id = function (request, response) {
-
+exports.Ws_get_cheque_entry_by_id = function (request, response) {
     var objutil = require("./Utility.js");
 
     var outPutData = "";
@@ -76,9 +72,8 @@ exports.Ws_get_quatation_by_id = function (request, response) {
     if (request.body.data) {
         try {
             var reqJsonString = request.body.data;
-            var quat_id = reqJsonString.quat_id;
-
-            if (quat_id == "" || quat_id == null || quat_id == undefined) {
+            var cheque_entry_id = reqJsonString.cheque_entry_id;
+            if (cheque_entry_id == "" || cheque_entry_id == null || cheque_entry_id == undefined) {
                 response.send(invalidData);
                 return;
             }
@@ -86,7 +81,6 @@ exports.Ws_get_quatation_by_id = function (request, response) {
             var errMessage = err.message;
             console.log("Error in data :" + errMessage);
             response.send(error);
-
             return;
         }
     }
@@ -98,22 +92,18 @@ exports.Ws_get_quatation_by_id = function (request, response) {
             response.send(error);
             return;
         } else {
-            ObjectDB.get_quatation_by_id(quat_id, connection, function (callback) {
+            ObjectDB.get_cheque_entry_by_id(cheque_entry_id, connection, function (callback) {
                 if (callback) {
-                    data = callback;
-                    var Arr_Temp = data;
-                    var newsubstr = JSON.stringify(Arr_Temp);
-
+                    var newsubstr = JSON.stringify(callback);
                     if (newsubstr.indexOf("status") > -1 && newsubstr.indexOf("500") > -1 && newsubstr.indexOf("Internal server error") > -1) {
                         response.send(error);
                         return;
                     } else {
-                        if (data.length > 0) {
-                            Result = '{"quatations" : ' + JSON.stringify(data) + '}';
+                        if (callback.length > 0) {
+                            Result = '{"chequeEntries" : ' + JSON.stringify(callback) + '}';
                             Result = Result.substring(0, Result.length - 1);
                             Result = Result + ',' + '"status":200';
                             Result = Result + ',' + '"message" :"success"' + '}';
-
                             response.send(Result);
                             return;
                         } else {
@@ -123,13 +113,13 @@ exports.Ws_get_quatation_by_id = function (request, response) {
                         }
                     }
                 }
-            })
+            });
         }
     })
 }
 
-//This web service is used to set quatation details
-exports.Ws_set_quatation = function (request, response) {
+//This web service is used to set customer details
+exports.Ws_set_cheque_entry = function (request, response) {
 
     var objutil = require("./Utility.js");
 
@@ -145,12 +135,17 @@ exports.Ws_set_quatation = function (request, response) {
         try {
             var reqJsonString = request.body.data;
 
-            var quat_date = reqJsonString.quat_date;
-            var quat_cust_id = reqJsonString.quat_cust_id;
-            var quat_products = reqJsonString.quat_products;
+            var cheque_date = reqJsonString.cheque_date;
+            var cheque_number = reqJsonString.cheque_number;
+            var cheque_amount = reqJsonString.cheque_amount;
+            var account_no = reqJsonString.account_no;
+            var cheque_cust_id = reqJsonString.cheque_cust_id;
 
-            if (quat_date == "" || quat_date == null || quat_date == undefined ||
-                quat_cust_id == "" || quat_cust_id == null || quat_cust_id == undefined) {
+            if (cheque_date == "" || cheque_date == null || cheque_date == undefined ||
+                cheque_number == "" || cheque_number == null || cheque_number == undefined ||
+                cheque_amount == "" || cheque_amount == null || cheque_amount == undefined ||
+                account_no == "" || account_no == null || account_no == undefined ||
+                cheque_cust_id == "" || cheque_cust_id == null || cheque_cust_id == undefined) {
                 response.send(invalidData);
                 return;
             }
@@ -158,18 +153,17 @@ exports.Ws_set_quatation = function (request, response) {
             var errMessage = err.message;
             console.log("Error in data :" + errMessage);
             response.send(error);
-
             return;
         }
     }
 
     request.getConnection(function (err, connection) {
-        console.log("input data connection");
+
         if (err) {
             response.send(error);
             return;
         } else {
-            ObjectDB.set_quatation_detail(quat_date, quat_cust_id, quat_products, connection, function (callback) {
+            ObjectDB.set_cheque_entry(cheque_date, cheque_number, cheque_amount, account_no, cheque_cust_id, connection, function (callback) {
                 if (callback) {
                     data = JSON.stringify(callback);
 
@@ -178,59 +172,7 @@ exports.Ws_set_quatation = function (request, response) {
                         return;
                     } else {
                         if (callback.insertId > 0) {
-                            Result = '{"status":200' + ',' + '"message" :"Quatation added successfully."' + '}';
-                            response.send(Result);
-                            return;
-                           
-                        } else {
-                            Result = failure;
-                            response.send(Result);
-                            return;
-                        }
-                    }
-                }
-            });
-        }
-    })
-};
-
-
-
-exports.Ws_get_quatation_products = function (request, response) {
-
-    var objutil = require("./Utility.js");
-
-    var outPutData = "";
-    var success = objutil.Save;
-    var failure = objutil.Failure;
-    var invalidData = objutil.invalidData;
-    var delete1 = objutil.delete1;
-    var error = objutil.error;
-    var Update = objutil.Update;
-
-    request.getConnection(function (err, connection) {
-
-        if (err) {
-            console.log("Error while connecting DB :" + err);
-            response.send(error);
-            return;
-        } else {
-            ObjectDB.get_quatation_products(connection, function (callback) {
-                if (callback) {
-                    data = callback;
-                    var Arr_Temp = data;
-                    var newsubstr = JSON.stringify(Arr_Temp);
-
-                    if (newsubstr.indexOf("status") > -1 && newsubstr.indexOf("500") > -1 && newsubstr.indexOf("Internal server error") > -1) {
-                        response.send(error);
-                        return;
-                    } else {
-                        if (data.length > 0) {
-                            Result = '{"quatation" : ' + JSON.stringify(data) + '}';
-                            Result = Result.substring(0, Result.length - 1);
-                            Result = Result + ',' + '"status":200';
-                            Result = Result + ',' + '"message" :"success"' + '}';
-
+                            Result = '{"status":200' + ',' + '"message" :"Cheque entry added successfully."' + '}';
                             response.send(Result);
                             return;
                         } else {
@@ -245,7 +187,9 @@ exports.Ws_get_quatation_products = function (request, response) {
     })
 };
 
-exports.Ws_get_quatation_products_by_id = function (request, response) {
+
+//This web service is used to set customer details
+exports.Ws_update_cheque_entry = function (request, response) {
 
     var objutil = require("./Utility.js");
 
@@ -260,10 +204,18 @@ exports.Ws_get_quatation_products_by_id = function (request, response) {
     if (request.body.data) {
         try {
             var reqJsonString = request.body.data;
-
-            var quat_id = reqJsonString.quat_id;
-
-            if (quat_id == "" || quat_id == null || quat_id == undefined) {
+            var cheque_entry_id = reqJsonString.cheque_entry_id;
+            var cheque_date = reqJsonString.cheque_date;
+            var cheque_number = reqJsonString.cheque_number;
+            var cheque_amount = reqJsonString.cheque_amount;
+            var account_no = reqJsonString.account_no;
+            var cheque_cust_id = reqJsonString.cheque_cust_id;
+            if (cheque_entry_id == "" || cheque_entry_id == null || cheque_entry_id == undefined ||
+                cheque_date == "" || cheque_date == null || cheque_date == undefined ||
+                cheque_number == "" || cheque_number == null || cheque_number == undefined ||
+                cheque_amount == "" || cheque_amount == null || cheque_amount == undefined ||
+                account_no == "" || account_no == null || account_no == undefined ||
+                cheque_cust_id == "" || cheque_cust_id == null || cheque_cust_id == undefined) {
                 response.send(invalidData);
                 return;
             }
@@ -271,7 +223,6 @@ exports.Ws_get_quatation_products_by_id = function (request, response) {
             var errMessage = err.message;
             console.log("Error in data :" + errMessage);
             response.send(error);
-
             return;
         }
     }
@@ -279,26 +230,75 @@ exports.Ws_get_quatation_products_by_id = function (request, response) {
     request.getConnection(function (err, connection) {
 
         if (err) {
-            console.log("Error while connecting DB :" + err);
             response.send(error);
             return;
         } else {
-            ObjectDB.get_quatation_products_by_id(quat_id, connection, function (callback) {
+            ObjectDB.update_cheque_entry(cheque_entry_id, cheque_date, cheque_number, cheque_amount, account_no, cheque_cust_id, connection, function (callback) {
                 if (callback) {
-                    data = callback;
-                    var Arr_Temp = data;
-                    var newsubstr = JSON.stringify(Arr_Temp);
 
-                    if (newsubstr.indexOf("status") > -1 && newsubstr.indexOf("500") > -1 && newsubstr.indexOf("Internal server error") > -1) {
+                    if (callback.affectedRows < 1) {
                         response.send(error);
                         return;
                     } else {
-                        if (data.length > 0) {
-                            Result = '{"products" : ' + JSON.stringify(data) + '}';
-                            Result = Result.substring(0, Result.length - 1);
-                            Result = Result + ',' + '"status":200';
-                            Result = Result + ',' + '"message" :"success"' + '}';
+                        if (callback.affectedRows > 0) {
+                            Result = '{"status":200' + ',' + '"message" :"Cheque entry updated successfully."' + '}';
+                            response.send(Result);
+                            return;
+                        } else {
+                            Result = failure;
+                            response.send(Result);
+                            return;
+                        }
+                    }
+                }
+            });
+        }
+    })
+};
 
+
+exports.Ws_delete_cheque_entry = function (request, response) {
+
+    var objutil = require("./Utility.js");
+
+    var outPutData = "";
+    var success = objutil.Save;
+    var failure = objutil.Failure;
+    var invalidData = objutil.invalidData;
+    var delete1 = objutil.delete1;
+    var error = objutil.error;
+    var Update = objutil.Update;
+
+    if (request.body.data) {
+        try {
+            var reqJsonString = request.body.data;
+            var cheque_entry_id = reqJsonString.cheque_entry_id;
+            if (cheque_entry_id == "" || cheque_entry_id == null || cheque_entry_id == undefined) {
+                response.send(invalidData);
+                return;
+            }
+        } catch (err) {
+            var errMessage = err.message;
+            console.log("Error in data :" + errMessage);
+            response.send(error);
+            return;
+        }
+    }
+
+    request.getConnection(function (err, connection) {
+
+        if (err) {
+            response.send(error);
+            return;
+        } else {
+            ObjectDB.delete_cheque_entry(cheque_entry_id, connection, function (callback) {
+                if (callback) {
+                    if (callback.affectedRows < 1) {
+                        response.send(error);
+                        return;
+                    } else {
+                        if (callback.affectedRows > 0) {
+                            Result = '{"status":200' + ',' + '"message" :"Cheque entry deleted successfully."' + '}';
                             response.send(Result);
                             return;
                         } else {

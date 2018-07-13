@@ -34,16 +34,14 @@ exports.Ws_get_invoices = function (request, response) {
 
             ObjectDB.Ws_get_invoices(connection, function (callback) {
                 if (callback) {
-                    data = callback;
-                    var Arr_Temp = data;
-                    var newsubstr = JSON.stringify(Arr_Temp);
+                    var newsubstr = JSON.stringify(callback);
 
                     if (newsubstr.indexOf("status") > -1 && newsubstr.indexOf("500") > -1 && newsubstr.indexOf("Internal server error") > -1) {
                         response.send(error);
                         return;
                     } else {
-                        if (data.length > 0) {
-                            Result = '{"invoices" : ' + JSON.stringify(data) + '}';
+                        if (newsubstr.length > 0) {
+                            Result = '{"invoices" : ' + JSON.stringify(callback) + '}';
                             Result = Result.substring(0, Result.length - 1);
                             Result = Result + ',' + '"status":200';
                             Result = Result + ',' + '"message" :"success"' + '}';
@@ -60,6 +58,71 @@ exports.Ws_get_invoices = function (request, response) {
         }
     })
 };
+
+exports.Ws_get_invoice_by_id = function (request, response) {
+
+    var objutil = require("./Utility.js");
+
+    var outPutData = "";
+    var success = objutil.Save;
+    var failure = objutil.Failure;
+    var invalidData = objutil.invalidData;
+    var delete1 = objutil.delete1;
+    var error = objutil.error;
+    var Update = objutil.Update;
+
+    if (request.body.data) {
+        try {
+            var reqJsonString = request.body.data;
+
+            var inv_id = reqJsonString.inv_id;
+            if (inv_id == "" || inv_id == null || inv_id == undefined) {
+                response.send(invalidData);
+                return;
+            }
+        } catch (err) {
+            var errMessage = err.message;
+            console.log("Error in data :" + errMessage);
+            response.send(error);
+
+            return;
+        }
+    }
+
+    request.getConnection(function (err, connection) {
+
+        if (err) {
+            console.log("Error while connecting DB :" + err);
+            response.send(error);
+            return;
+        } else {
+            ObjectDB.get_invoice_by_id(inv_id, connection, function (callback) {
+                if (callback) {
+                    var newsubstr = JSON.stringify(callback);
+                    
+                    if (newsubstr.indexOf("status") > -1 && newsubstr.indexOf("500") > -1 && newsubstr.indexOf("Internal server error") > -1) {
+                        response.send(error);
+                        return;
+                    } else {
+                        if (callback.length > 0) {
+                            Result = '{"invoices" : ' + JSON.stringify(callback) + '}';
+                            Result = Result.substring(0, Result.length - 1);
+                            Result = Result + ',' + '"status":200';
+                            Result = Result + ',' + '"message" :"success"' + '}';
+
+                            response.send(Result);
+                            return;
+                        } else {
+                            Result = failure;
+                            response.send(Result);
+                            return;
+                        }
+                    }
+                }
+            })
+        }
+    })
+}
 
 //This web service is use to set customer details .
 exports.Ws_set_invoice = function (request, response) {
@@ -109,7 +172,6 @@ exports.Ws_set_invoice = function (request, response) {
         } else {
             ObjectDB.Ws_set_invoice_detail(inv_date, cust_id, inv_total, inv_products, connection, function (callback) {
                 if (callback) {
-                    data = JSON.stringify(callback);
                     if (callback.affectedRows < 1) {
                         response.send(error);
                         return;
