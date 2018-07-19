@@ -11,7 +11,7 @@ var http = require('http');
 var ObjDB = require("./DataAccess.js");
 var ObjectDB = new ObjDB();
 
-exports.Ws_get_invoices = function (request, response) {
+exports.Ws_get_invoices = function(request, response) {
 
     var objutil = require("./Utility.js");
 
@@ -24,7 +24,7 @@ exports.Ws_get_invoices = function (request, response) {
     var Update = objutil.Update;
 
 
-    request.getConnection(function (err, connection) {
+    request.getConnection(function(err, connection) {
 
         if (err) {
             console.log("Error while connecting DB :" + err);
@@ -32,7 +32,7 @@ exports.Ws_get_invoices = function (request, response) {
             return;
         } else {
 
-            ObjectDB.Ws_get_invoices(connection, function (callback) {
+            ObjectDB.Ws_get_invoices(connection, function(callback) {
                 if (callback) {
                     var newsubstr = JSON.stringify(callback);
 
@@ -59,7 +59,7 @@ exports.Ws_get_invoices = function (request, response) {
     })
 };
 
-exports.Ws_get_invoice_by_id = function (request, response) {
+exports.Ws_get_invoice_by_id = function(request, response) {
 
     var objutil = require("./Utility.js");
 
@@ -89,17 +89,17 @@ exports.Ws_get_invoice_by_id = function (request, response) {
         }
     }
 
-    request.getConnection(function (err, connection) {
+    request.getConnection(function(err, connection) {
 
         if (err) {
             console.log("Error while connecting DB :" + err);
             response.send(error);
             return;
         } else {
-            ObjectDB.get_invoice_by_id(inv_id, connection, function (callback) {
+            ObjectDB.get_invoice_by_id(inv_id, connection, function(callback) {
                 if (callback) {
                     var newsubstr = JSON.stringify(callback);
-                    
+
                     if (newsubstr.indexOf("status") > -1 && newsubstr.indexOf("500") > -1 && newsubstr.indexOf("Internal server error") > -1) {
                         response.send(error);
                         return;
@@ -125,7 +125,7 @@ exports.Ws_get_invoice_by_id = function (request, response) {
 }
 
 //This web service is use to set customer details .
-exports.Ws_set_invoice = function (request, response) {
+exports.Ws_set_invoice = function(request, response) {
 
     var objutil = require("./Utility.js");
 
@@ -163,14 +163,14 @@ exports.Ws_set_invoice = function (request, response) {
             return;
         }
     }
-    request.getConnection(function (err, connection) {
+    request.getConnection(function(err, connection) {
 
         if (err) {
             console.log("Error while connecting DB :" + err);
             response.send(error);
             return;
         } else {
-            ObjectDB.Ws_set_invoice_detail(inv_date, cust_id, inv_total, inv_products, connection, function (callback) {
+            ObjectDB.Ws_set_invoice_detail(inv_date, cust_id, inv_total, inv_products, connection, function(callback) {
                 if (callback) {
                     if (callback.affectedRows < 1) {
                         response.send(error);
@@ -192,7 +192,7 @@ exports.Ws_set_invoice = function (request, response) {
     })
 };
 
-exports.Ws_get_invoice_products_by_id = function (request, response) {
+exports.Ws_get_invoice_products_by_id = function(request, response) {
 
     var objutil = require("./Utility.js");
 
@@ -220,13 +220,13 @@ exports.Ws_get_invoice_products_by_id = function (request, response) {
         }
     }
 
-    request.getConnection(function (err, connection) {
+    request.getConnection(function(err, connection) {
 
         if (err) {
             response.send(error);
             return;
         } else {
-            ObjectDB.Ws_get_invoice_products_by_id(inv_id, connection, function (callback) {
+            ObjectDB.get_invoice_products_by_id(inv_id, connection, function(callback) {
                 if (callback) {
                     data = callback;
                     var Arr_Temp = data;
