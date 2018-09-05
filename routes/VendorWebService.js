@@ -11,7 +11,7 @@ var http = require('http');
 var ObjDB = require("./DataAccess.js");
 var ObjectDB = new ObjDB();
 
-exports.Ws_get_vendors = function (request, response) {
+exports.Ws_get_vendors = function(request, response) {
 
     var objutil = require("./Utility.js");
 
@@ -23,13 +23,13 @@ exports.Ws_get_vendors = function (request, response) {
     var error = objutil.error;
     var Update = objutil.Update;
 
-    request.getConnection(function (err, connection) {
+    request.getConnection(function(err, connection) {
 
         if (err) {
             response.send(error);
             return;
         } else {
-            ObjectDB.get_vendor_details(connection, function (callback) {
+            ObjectDB.get_vendor_details(connection, function(callback) {
                 if (callback) {
                     data = callback;
                     var Arr_Temp = data;
@@ -60,7 +60,7 @@ exports.Ws_get_vendors = function (request, response) {
     })
 }
 
-exports.Ws_get_vendor_by_id = function (request, response) {
+exports.Ws_get_vendor_by_id = function(request, response) {
     var objutil = require("./Utility.js");
 
     var outPutData = "";
@@ -87,14 +87,14 @@ exports.Ws_get_vendor_by_id = function (request, response) {
         }
     }
 
-    request.getConnection(function (err, connection) {
+    request.getConnection(function(err, connection) {
 
         if (err) {
             console.log("Error while connecting DB :" + err);
             response.send(error);
             return;
         } else {
-            ObjectDB.get_vendor_by_id(vend_id, connection, function (callback) {
+            ObjectDB.get_vendor_by_id(vend_id, connection, function(callback) {
                 if (callback) {
                     var newsubstr = JSON.stringify(callback);
                     if (newsubstr.indexOf("status") > -1 && newsubstr.indexOf("500") > -1 && newsubstr.indexOf("Internal server error") > -1) {
@@ -120,7 +120,7 @@ exports.Ws_get_vendor_by_id = function (request, response) {
     })
 }
 
-exports.Ws_set_vendor = function (request, response) {
+exports.Ws_set_vendor = function(request, response) {
     var objutil = require("./Utility.js");
 
     var outPutData = "";
@@ -132,7 +132,7 @@ exports.Ws_set_vendor = function (request, response) {
     var Update = objutil.Update;
 
 
-    var reqJsonObj, reqJsonString, lastupdateddatetime, p_username;
+    var reqJsonString;
 
     if (request.body.data) {
         try {
@@ -142,10 +142,12 @@ exports.Ws_set_vendor = function (request, response) {
             var vend_contact = reqJsonString.vend_contact;
             var vend_email = reqJsonString.vend_email;
             var vend_address = reqJsonString.vend_address;
+            var vend_contact_person = reqJsonString.vend_contact_person;
             if (vend_name == "" || vend_name == null || vend_name == undefined ||
                 vend_contact == "" || vend_contact == null || vend_contact == undefined ||
                 vend_email == "" || vend_email == null || vend_email == undefined ||
-                vend_address == "" || vend_address == null || vend_address == undefined) {
+                vend_address == "" || vend_address == null || vend_address == undefined ||
+                vend_contact_person == "" || vend_contact_person == null || vend_contact_person == undefined) {
                 response.send(invalidData);
                 return;
             }
@@ -157,14 +159,14 @@ exports.Ws_set_vendor = function (request, response) {
         }
     }
 
-    request.getConnection(function (err, connection) {
+    request.getConnection(function(err, connection) {
 
         if (err) {
             console.log("Error while connecting DB :" + err);
             response.send(error);
             return;
         } else {
-            ObjectDB.set_vendor_details(vend_name, vend_contact, vend_email, vend_address, connection, function (callback) {
+            ObjectDB.set_vendor_details(vend_name, vend_contact, vend_email, vend_address, vend_contact_person, connection, function(callback) {
                 if (callback) {
                     console.log("data is :" + callback)
                     if (callback.affectedRows < 1) {
@@ -189,7 +191,7 @@ exports.Ws_set_vendor = function (request, response) {
 
 
 
-exports.Ws_update_vendor = function (request, response) {
+exports.Ws_update_vendor = function(request, response) {
     var objutil = require("./Utility.js");
 
     var outPutData = "";
@@ -230,14 +232,14 @@ exports.Ws_update_vendor = function (request, response) {
         }
     }
 
-    request.getConnection(function (err, connection) {
+    request.getConnection(function(err, connection) {
 
         if (err) {
             console.log("Error while connecting DB :" + err);
             response.send(error);
             return;
         } else {
-            ObjectDB.update_vendor_details(vend_id, vend_name, vend_contact_person, vend_contact, vend_email, vend_address, connection, function (callback) {
+            ObjectDB.update_vendor_details(vend_id, vend_name, vend_contact, vend_email, vend_address, vend_contact_person, connection, function(callback) {
                 if (callback) {
                     if (callback.affectedRows < 1) {
                         response.send(error);
@@ -259,7 +261,7 @@ exports.Ws_update_vendor = function (request, response) {
     })
 };
 
-exports.Ws_delete_vendor = function (request, response) {
+exports.Ws_delete_vendor = function(request, response) {
     var objutil = require("./Utility.js");
 
     var outPutData = "";
@@ -278,7 +280,7 @@ exports.Ws_delete_vendor = function (request, response) {
             var reqJsonString = request.body.data;
             var vend_id = reqJsonString.vend_id;
 
-            if (vend_id == "" || vend_id == null || vend_id == undefined ) {
+            if (vend_id == "" || vend_id == null || vend_id == undefined) {
                 response.send(invalidData);
                 return;
             }
@@ -290,17 +292,18 @@ exports.Ws_delete_vendor = function (request, response) {
         }
     }
 
-    request.getConnection(function (err, connection) {
+    request.getConnection(function(err, connection) {
 
         if (err) {
             console.log("Error while connecting DB :" + err);
             response.send(error);
             return;
         } else {
-            ObjectDB.delete_vendor_details(vend_id, connection, function (callback) {
+            ObjectDB.delete_vendor_details(vend_id, connection, function(callback) {
                 if (callback) {
-                    if (callback.affectedRows < 1) {
-                        response.send(error);
+                    if (callback.code === 'ER_ROW_IS_REFERENCED_2') {
+                        deleteError = '{"status":501' + ',' + '"message" :"Cannot delete vendor as it is used in Invoicing."' + '}';
+                        response.send(deleteError);
                         return;
                     } else {
                         if (callback.affectedRows > 0) {

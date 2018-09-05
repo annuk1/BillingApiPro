@@ -10,7 +10,7 @@ var http = require('http');
 var ObjDB = require("./DataAccess.js");
 var ObjectDB = new ObjDB();
 
-exports.Ws_get_vehicles = function (request, response) {
+exports.Ws_get_vehicles = function(request, response) {
 
     var objutil = require("./Utility.js");
 
@@ -23,13 +23,13 @@ exports.Ws_get_vehicles = function (request, response) {
     var Update = objutil.Update;
 
 
-    request.getConnection(function (err, connection) {
+    request.getConnection(function(err, connection) {
 
         if (err) {
             response.send(error);
             return;
         } else {
-            ObjectDB.get_vehicles(connection, function (callback) {
+            ObjectDB.get_vehicles(connection, function(callback) {
                 if (callback) {
                     data = callback;
                     var Arr_Temp = data;
@@ -59,7 +59,7 @@ exports.Ws_get_vehicles = function (request, response) {
     })
 }
 
-exports.Ws_get_vehicle_by_id = function (request, response) {
+exports.Ws_get_vehicle_by_id = function(request, response) {
     var objutil = require("./Utility.js");
 
     var outPutData = "";
@@ -86,14 +86,14 @@ exports.Ws_get_vehicle_by_id = function (request, response) {
         }
     }
 
-    request.getConnection(function (err, connection) {
+    request.getConnection(function(err, connection) {
 
         if (err) {
             console.log("Error while connecting DB :" + err);
             response.send(error);
             return;
         } else {
-            ObjectDB.get_vehicle_by_id(veh_id, connection, function (callback) {
+            ObjectDB.get_vehicle_by_id(veh_id, connection, function(callback) {
                 if (callback) {
                     var newsubstr = JSON.stringify(callback);
                     if (newsubstr.indexOf("status") > -1 && newsubstr.indexOf("500") > -1 && newsubstr.indexOf("Internal server error") > -1) {
@@ -120,7 +120,7 @@ exports.Ws_get_vehicle_by_id = function (request, response) {
 }
 
 //This web service is used to set customer details
-exports.Ws_set_vehicle = function (request, response) {
+exports.Ws_set_vehicle = function(request, response) {
 
     var objutil = require("./Utility.js");
 
@@ -139,8 +139,8 @@ exports.Ws_set_vehicle = function (request, response) {
             var veh_number = reqJsonString.veh_number;
             var veh_desc = reqJsonString.veh_desc;
             if (veh_name == "" || veh_name == null || veh_name == undefined ||
-                veh_number == "" || veh_number == null || veh_number == undefined
-                || veh_desc == null || veh_desc == undefined) {
+                veh_number == "" || veh_number == null || veh_number == undefined ||
+                veh_desc == null || veh_desc == undefined) {
                 response.send(invalidData);
                 return;
             }
@@ -151,13 +151,13 @@ exports.Ws_set_vehicle = function (request, response) {
         }
     }
 
-    request.getConnection(function (err, connection) {
+    request.getConnection(function(err, connection) {
 
         if (err) {
             response.send(error);
             return;
         } else {
-            ObjectDB.set_vehicle_detail(veh_name, veh_number, veh_desc, connection, function (callback) {
+            ObjectDB.set_vehicle_detail(veh_name, veh_number, veh_desc, connection, function(callback) {
                 if (callback) {
                     data = JSON.stringify(callback);
 
@@ -183,7 +183,7 @@ exports.Ws_set_vehicle = function (request, response) {
 
 
 //This web service is used to set customer details
-exports.Ws_update_vehicle = function (request, response) {
+exports.Ws_update_vehicle = function(request, response) {
 
     var objutil = require("./Utility.js");
 
@@ -205,8 +205,8 @@ exports.Ws_update_vehicle = function (request, response) {
 
             if (veh_id == "" || veh_id == null || veh_id == undefined ||
                 veh_name == "" || veh_name == null || veh_name == undefined ||
-                veh_number == "" || veh_number == null || veh_number == undefined
-                || veh_desc == null || veh_desc == undefined) {
+                veh_number == "" || veh_number == null || veh_number == undefined ||
+                veh_desc == null || veh_desc == undefined) {
                 response.send(invalidData);
                 return;
             }
@@ -217,13 +217,13 @@ exports.Ws_update_vehicle = function (request, response) {
         }
     }
 
-    request.getConnection(function (err, connection) {
+    request.getConnection(function(err, connection) {
 
         if (err) {
             response.send(error);
             return;
         } else {
-            ObjectDB.update_vehicle_detail(veh_id, veh_name, veh_number, veh_desc, connection, function (callback) {
+            ObjectDB.update_vehicle_detail(veh_id, veh_name, veh_number, veh_desc, connection, function(callback) {
                 if (callback) {
                     data = JSON.stringify(callback);
 
@@ -248,7 +248,7 @@ exports.Ws_update_vehicle = function (request, response) {
 };
 
 
-exports.Ws_delete_vehicle = function (request, response) {
+exports.Ws_delete_vehicle = function(request, response) {
 
     var objutil = require("./Utility.js");
 
@@ -264,7 +264,7 @@ exports.Ws_delete_vehicle = function (request, response) {
         try {
             var reqJsonString = request.body.data;
             var veh_id = reqJsonString.veh_id;
-            if (veh_id == "" || veh_id == null || veh_id == undefined ) {
+            if (veh_id == "" || veh_id == null || veh_id == undefined) {
                 response.send(invalidData);
                 return;
             }
@@ -276,18 +276,19 @@ exports.Ws_delete_vehicle = function (request, response) {
         }
     }
 
-    request.getConnection(function (err, connection) {
+    request.getConnection(function(err, connection) {
 
         if (err) {
             response.send(error);
             return;
         } else {
-            ObjectDB.delete_vehicle_detail(veh_id, connection, function (callback) {
+            ObjectDB.delete_vehicle_detail(veh_id, connection, function(callback) {
                 if (callback) {
                     data = JSON.stringify(callback);
 
-                    if (callback.affectedRows < 1) {
-                        response.send(error);
+                    if (callback.code === 'ER_ROW_IS_REFERENCED_2') {
+                        deleteError = '{"status":501' + ',' + '"message" :"Cannot delete vehicle as it is used in Invoicing."' + '}';
+                        response.send(deleteError);
                         return;
                     } else {
                         if (callback.affectedRows > 0) {

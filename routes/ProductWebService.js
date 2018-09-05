@@ -5,7 +5,7 @@ var request = require('request');
 var ObjDB = require("./DataAccess.js");
 var ObjectDB = new ObjDB();
 
-exports.Ws_get_products = function (request, response) {
+exports.Ws_get_products = function(request, response) {
     var objutil = require("./Utility.js");
 
     var outPutData = "";
@@ -15,14 +15,14 @@ exports.Ws_get_products = function (request, response) {
     var delete1 = objutil.delete1;
     var error = objutil.error;
     var Update = objutil.Update;
-    request.getConnection(function (err, connection) {
+    request.getConnection(function(error, connection) {
 
-        if (err) {
-            console.log("Error while connecting DB :" + err);
+        if (error) {
+            console.log("Error while connecting DB :" + error);
             response.send(error);
             return;
         } else {
-            ObjectDB.get_products(connection, function (callback) {
+            ObjectDB.get_products(connection, function(callback) {
                 if (callback) {
                     data = callback;
                     var Arr_Temp = data;
@@ -51,7 +51,7 @@ exports.Ws_get_products = function (request, response) {
     })
 }
 
-exports.Ws_get_products_by_id = function (request, response) {
+exports.Ws_get_products_by_id = function(request, response) {
     var objutil = require("./Utility.js");
 
     var outPutData = "";
@@ -66,26 +66,26 @@ exports.Ws_get_products_by_id = function (request, response) {
         try {
             var reqJsonString = request.body.data;
             var prod_id = reqJsonString.prod_id;
-            if (prod_id == "" || prod_id == null || prod_id == undefined ) {
+            if (prod_id == "" || prod_id == null || prod_id == undefined) {
                 response.send(invalidData);
                 return;
             }
-        } catch (err) {
-            var errMessage = err.message;
+        } catch (error) {
+            var errMessage = error.message;
             console.log("Error in data :" + errMessage);
             response.send(error);
             return;
         }
     }
 
-    request.getConnection(function (err, connection) {
+    request.getConnection(function(error, connection) {
 
-        if (err) {
-            console.log("Error while connecting DB :" + err);
+        if (error) {
+            console.log("Error while connecting DB :" + error);
             response.send(error);
             return;
         } else {
-            ObjectDB.get_products_by_id(prod_id, connection, function (callback) {
+            ObjectDB.get_products_by_id(prod_id, connection, function(callback) {
                 if (callback) {
                     data = callback;
                     var newsubstr = JSON.stringify(data);
@@ -112,7 +112,7 @@ exports.Ws_get_products_by_id = function (request, response) {
     })
 }
 
-exports.Ws_set_product = function (request, response) {
+exports.Ws_set_product = function(request, response) {
 
     var objutil = require("./Utility.js");
     var outPutData = "";
@@ -131,27 +131,30 @@ exports.Ws_set_product = function (request, response) {
             var prod_desc = reqJsonString.prod_desc;
             var prod_unit = reqJsonString.prod_unit;
             var prod_rate = reqJsonString.prod_rate;
+            var prod_gst_id = reqJsonString.prod_gst_id;
+
             if (prod_name == "" || prod_name == null || prod_name == undefined ||
                 prod_unit == "" || prod_unit == null || prod_unit == undefined ||
-                prod_rate == "" || prod_rate == null || prod_rate == undefined) {
+                prod_rate == "" || prod_rate == null || prod_rate == undefined ||
+                prod_gst_id == "" || prod_gst_id == null || prod_gst_id == undefined) {
                 response.send(invalidData);
                 return;
             }
-        } catch (err) {
-            var errMessage = err.message;
+        } catch (error) {
+            var errMessage = error.message;
             console.log("Error in data :" + errMessage);
             response.send(error);
             return;
         }
     }
 
-    request.getConnection(function (err, connection) {
+    request.getConnection(function(error, connection) {
 
-        if (err) {
+        if (error) {
             response.send(error);
             return;
         } else {
-            ObjectDB.set_product_detail(prod_name, prod_desc, prod_unit, prod_rate, connection, function (callback) {
+            ObjectDB.set_product_detail(prod_name, prod_desc, prod_unit, prod_rate, prod_gst_id, connection, function(callback) {
                 if (callback) {
 
                     if (callback.affectedRows < 1) {
@@ -176,7 +179,7 @@ exports.Ws_set_product = function (request, response) {
 };
 
 
-exports.Ws_update_product = function (request, response) {
+exports.Ws_update_product = function(request, response) {
 
     var objutil = require("./Utility.js");
     var outPutData = "";
@@ -195,28 +198,31 @@ exports.Ws_update_product = function (request, response) {
             var prod_desc = reqJsonString.prod_desc;
             var prod_unit = reqJsonString.prod_unit;
             var prod_rate = reqJsonString.prod_rate;
+            var prod_gst_id = reqJsonString.prod_gst_id;
+
             if (prod_id == "" || prod_id == null || prod_id == undefined ||
                 prod_name == "" || prod_name == null || prod_name == undefined ||
                 prod_unit == "" || prod_unit == null || prod_unit == undefined ||
-                prod_rate == "" || prod_rate == null || prod_rate == undefined) {
+                prod_rate == "" || prod_rate == null || prod_rate == undefined ||
+                prod_gst_id == "" || prod_gst_id == null || prod_gst_id == undefined) {
                 response.send(invalidData);
                 return;
             }
-        } catch (err) {
-            var errMessage = err.message;
+        } catch (error) {
+            var errMessage = error.message;
             console.log("Error in data :" + errMessage);
             response.send(error);
             return;
         }
     }
 
-    request.getConnection(function (err, connection) {
+    request.getConnection(function(error, connection) {
 
-        if (err) {
+        if (error) {
             response.send(error);
             return;
         } else {
-            ObjectDB.update_product_detail(prod_id, prod_name, prod_desc, prod_unit, prod_rate, connection, function (callback) {
+            ObjectDB.update_product_detail(prod_id, prod_name, prod_desc, prod_unit, prod_rate, prod_gst_id, connection, function(callback) {
                 if (callback) {
                     if (callback.affectedRows < 1) {
                         response.send(error);
@@ -239,7 +245,7 @@ exports.Ws_update_product = function (request, response) {
 };
 
 
-exports.Ws_delete_product = function (request, response) {
+exports.Ws_delete_product = function(request, response) {
 
     var objutil = require("./Utility.js");
     var outPutData = "";
@@ -259,24 +265,24 @@ exports.Ws_delete_product = function (request, response) {
                 response.send(invalidData);
                 return;
             }
-        } catch (err) {
-            var errMessage = err.message;
+        } catch (error) {
+            var errMessage = error.message;
             console.log("Error in data :" + errMessage);
             response.send(error);
             return;
         }
     }
 
-    request.getConnection(function (err, connection) {
-
-        if (err) {
+    request.getConnection(function(error, connection) {
+        if (error) {
             response.send(error);
             return;
         } else {
-            ObjectDB.delete_product_detail(prod_id, connection, function (callback) {
+            ObjectDB.delete_product_detail(prod_id, connection, function(callback) {
                 if (callback) {
-                    if (callback.affectedRows < 1) {
-                        response.send(error);
+                    if (callback.code === 'ER_ROW_IS_REFERENCED_2') {
+                        deleteError = '{"status":501' + ',' + '"message" :"Cannot delete product as it is used in Invoicing."' + '}';
+                        response.send(deleteError);
                         return;
                     } else {
                         if (callback.affectedRows > 0) {

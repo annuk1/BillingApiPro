@@ -10,7 +10,7 @@ var http = require('http');
 var ObjDB = require("./DataAccess.js");
 var ObjectDB = new ObjDB();
 
-exports.Ws_get_cheque_entries = function (request, response) {
+exports.Ws_get_cheque_entries = function(request, response) {
 
     var objutil = require("./Utility.js");
 
@@ -23,14 +23,14 @@ exports.Ws_get_cheque_entries = function (request, response) {
     var Update = objutil.Update;
 
 
-    request.getConnection(function (err, connection) {
+    request.getConnection(function(err, connection) {
 
         if (err) {
             console.log("Error while connecting DB :" + err);
             response.send(error);
             return;
         } else {
-            ObjectDB.get_cheque_entries(connection, function (callback) {
+            ObjectDB.get_cheque_entries(connection, function(callback) {
                 if (callback) {
                     var newsubstr = JSON.stringify(callback);
 
@@ -58,7 +58,7 @@ exports.Ws_get_cheque_entries = function (request, response) {
     })
 }
 
-exports.Ws_get_cheque_entry_by_id = function (request, response) {
+exports.Ws_get_cheque_entry_by_id = function(request, response) {
     var objutil = require("./Utility.js");
 
     var outPutData = "";
@@ -85,14 +85,14 @@ exports.Ws_get_cheque_entry_by_id = function (request, response) {
         }
     }
 
-    request.getConnection(function (err, connection) {
+    request.getConnection(function(err, connection) {
 
         if (err) {
             console.log("Error while connecting DB :" + err);
             response.send(error);
             return;
         } else {
-            ObjectDB.get_cheque_entry_by_id(cheque_entry_id, connection, function (callback) {
+            ObjectDB.get_cheque_entry_by_id(cheque_entry_id, connection, function(callback) {
                 if (callback) {
                     var newsubstr = JSON.stringify(callback);
                     if (newsubstr.indexOf("status") > -1 && newsubstr.indexOf("500") > -1 && newsubstr.indexOf("Internal server error") > -1) {
@@ -119,7 +119,7 @@ exports.Ws_get_cheque_entry_by_id = function (request, response) {
 }
 
 //This web service is used to set customer details
-exports.Ws_set_cheque_entry = function (request, response) {
+exports.Ws_set_cheque_entry = function(request, response) {
 
     var objutil = require("./Utility.js");
 
@@ -157,16 +157,14 @@ exports.Ws_set_cheque_entry = function (request, response) {
         }
     }
 
-    request.getConnection(function (err, connection) {
+    request.getConnection(function(err, connection) {
 
         if (err) {
             response.send(error);
             return;
         } else {
-            ObjectDB.set_cheque_entry(cheque_date, cheque_number, cheque_amount, account_no, cheque_cust_id, connection, function (callback) {
+            ObjectDB.set_cheque_entry(cheque_date, cheque_number, cheque_amount, account_no, cheque_cust_id, connection, function(callback) {
                 if (callback) {
-                    data = JSON.stringify(callback);
-
                     if (callback.affectedRows < 1) {
                         response.send(error);
                         return;
@@ -189,7 +187,7 @@ exports.Ws_set_cheque_entry = function (request, response) {
 
 
 //This web service is used to set customer details
-exports.Ws_update_cheque_entry = function (request, response) {
+exports.Ws_update_cheque_entry = function(request, response) {
 
     var objutil = require("./Utility.js");
 
@@ -227,13 +225,13 @@ exports.Ws_update_cheque_entry = function (request, response) {
         }
     }
 
-    request.getConnection(function (err, connection) {
+    request.getConnection(function(err, connection) {
 
         if (err) {
             response.send(error);
             return;
         } else {
-            ObjectDB.update_cheque_entry(cheque_entry_id, cheque_date, cheque_number, cheque_amount, account_no, cheque_cust_id, connection, function (callback) {
+            ObjectDB.update_cheque_entry(cheque_entry_id, cheque_date, cheque_number, cheque_amount, account_no, cheque_cust_id, connection, function(callback) {
                 if (callback) {
 
                     if (callback.affectedRows < 1) {
@@ -257,7 +255,7 @@ exports.Ws_update_cheque_entry = function (request, response) {
 };
 
 
-exports.Ws_delete_cheque_entry = function (request, response) {
+exports.Ws_delete_cheque_entry = function(request, response) {
 
     var objutil = require("./Utility.js");
 
@@ -285,16 +283,17 @@ exports.Ws_delete_cheque_entry = function (request, response) {
         }
     }
 
-    request.getConnection(function (err, connection) {
+    request.getConnection(function(err, connection) {
 
         if (err) {
             response.send(error);
             return;
         } else {
-            ObjectDB.delete_cheque_entry(cheque_entry_id, connection, function (callback) {
+            ObjectDB.delete_cheque_entry(cheque_entry_id, connection, function(callback) {
                 if (callback) {
-                    if (callback.affectedRows < 1) {
-                        response.send(error);
+                    if (callback.code === 'ER_ROW_IS_REFERENCED_2') {
+                        deleteError = '{"status":501' + ',' + '"message" :"Cannot delete cheque entry as it is used in Invoicing."' + '}';
+                        response.send(deleteError);
                         return;
                     } else {
                         if (callback.affectedRows > 0) {

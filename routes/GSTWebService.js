@@ -5,7 +5,7 @@ var request = require('request');
 var ObjDB = require("./DataAccess.js");
 var ObjectDB = new ObjDB();
 
-exports.Ws_get_gst_details = function (request, response) {
+exports.Ws_get_gst_details = function(request, response) {
     var objutil = require("./Utility.js");
 
     var outPutData = "";
@@ -15,13 +15,13 @@ exports.Ws_get_gst_details = function (request, response) {
     var delete1 = objutil.delete1;
     var error = objutil.error;
     var Update = objutil.Update;
-    request.getConnection(function (err, connection) {
+    request.getConnection(function(err, connection) {
 
         if (err) {
             response.send(error);
             return;
         } else {
-            ObjectDB.get_gst_details(connection, function (callback) {
+            ObjectDB.get_gst_details(connection, function(callback) {
                 if (callback) {
                     var newsubstr = JSON.stringify(callback);
                     if (newsubstr.indexOf("status") > -1 && newsubstr.indexOf("500") > -1 && newsubstr.indexOf("Internal server error") > -1) {
@@ -48,7 +48,7 @@ exports.Ws_get_gst_details = function (request, response) {
     })
 }
 
-exports.Ws_get_gst_detail_by_id = function (request, response) {
+exports.Ws_get_gst_detail_by_id = function(request, response) {
     var objutil = require("./Utility.js");
 
     var outPutData = "";
@@ -75,14 +75,14 @@ exports.Ws_get_gst_detail_by_id = function (request, response) {
         }
     }
 
-    request.getConnection(function (err, connection) {
+    request.getConnection(function(err, connection) {
 
         if (err) {
             console.log("Error while connecting DB :" + err);
             response.send(error);
             return;
         } else {
-            ObjectDB.get_gst_detail_by_id(gst_id, connection, function (callback) {
+            ObjectDB.get_gst_detail_by_id(gst_id, connection, function(callback) {
                 if (callback) {
                     var newsubstr = JSON.stringify(callback);
                     if (newsubstr.indexOf("status") > -1 && newsubstr.indexOf("500") > -1 && newsubstr.indexOf("Internal server error") > -1) {
@@ -108,7 +108,7 @@ exports.Ws_get_gst_detail_by_id = function (request, response) {
     })
 }
 
-exports.Ws_set_gst_detail = function (request, response) {
+exports.Ws_set_gst_detail = function(request, response) {
 
     var objutil = require("./Utility.js");
     var outPutData = "";
@@ -139,13 +139,13 @@ exports.Ws_set_gst_detail = function (request, response) {
         }
     }
 
-    request.getConnection(function (err, connection) {
+    request.getConnection(function(err, connection) {
 
         if (err) {
             response.send(error);
             return;
         } else {
-            ObjectDB.set_gst_detail(gst_hsn, gst_percentage, gst_desc, connection, function (callback) {
+            ObjectDB.set_gst_detail(gst_hsn, gst_percentage, gst_desc, connection, function(callback) {
                 if (callback) {
                     if (callback.affectedRows < 1) {
                         response.send(error);
@@ -169,7 +169,7 @@ exports.Ws_set_gst_detail = function (request, response) {
 };
 
 
-exports.Ws_update_gst_detail = function (request, response) {
+exports.Ws_update_gst_detail = function(request, response) {
 
     var objutil = require("./Utility.js");
     var outPutData = "";
@@ -189,9 +189,9 @@ exports.Ws_update_gst_detail = function (request, response) {
             var gst_desc = reqJsonString.gst_desc;
 
             if (gst_id == "" || gst_id == null || gst_id == undefined ||
-            gst_hsn == "" || gst_hsn == null || gst_hsn == undefined ||
-            gst_percentage == "" || gst_percentage == null || gst_percentage == undefined ||
-            gst_desc == null || gst_desc == undefined) {
+                gst_hsn == "" || gst_hsn == null || gst_hsn == undefined ||
+                gst_percentage == "" || gst_percentage == null || gst_percentage == undefined ||
+                gst_desc == null || gst_desc == undefined) {
                 response.send(invalidData);
                 return;
             }
@@ -203,13 +203,13 @@ exports.Ws_update_gst_detail = function (request, response) {
         }
     }
 
-    request.getConnection(function (err, connection) {
+    request.getConnection(function(err, connection) {
 
         if (err) {
             response.send(error);
             return;
         } else {
-            ObjectDB.update_gst_detail(gst_id, gst_hsn, gst_percentage, gst_desc, connection, function (callback) {
+            ObjectDB.update_gst_detail(gst_id, gst_hsn, gst_percentage, gst_desc, connection, function(callback) {
                 if (callback) {
                     if (callback.affectedRows < 1) {
                         response.send(error);
@@ -232,7 +232,7 @@ exports.Ws_update_gst_detail = function (request, response) {
 };
 
 
-exports.Ws_delete_gst_detail = function (request, response) {
+exports.Ws_delete_gst_detail = function(request, response) {
 
     var objutil = require("./Utility.js");
     var outPutData = "";
@@ -260,16 +260,17 @@ exports.Ws_delete_gst_detail = function (request, response) {
         }
     }
 
-    request.getConnection(function (err, connection) {
+    request.getConnection(function(err, connection) {
 
         if (err) {
             response.send(error);
             return;
         } else {
-            ObjectDB.delete_gst_detail(gst_id, connection, function (callback) {
+            ObjectDB.delete_gst_detail(gst_id, connection, function(callback) {
                 if (callback) {
-                    if (callback.affectedRows < 1) {
-                        response.send(error);
+                    if (callback.code === 'ER_ROW_IS_REFERENCED_2') {
+                        deleteError = '{"status":501' + ',' + '"message" :"Cannot delete GST details as it is used in Invoicing."' + '}';
+                        response.send(deleteError);
                         return;
                     } else {
                         if (callback.affectedRows > 0) {
