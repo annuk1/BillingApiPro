@@ -1,4 +1,3 @@
-//Declaration
 var express = require("express");
 var app = express();
 var bodyParser = require("body-parser");
@@ -11,7 +10,7 @@ var http = require('http');
 var ObjDB = require("./DataAccess.js");
 var ObjectDB = new ObjDB();
 
-exports.Ws_get_challans = function(request, response) {
+exports.Ws_get_diesel_entries = function(request, response) {
 
     var objutil = require("./Utility.js");
 
@@ -23,75 +22,15 @@ exports.Ws_get_challans = function(request, response) {
     var error = objutil.error;
     var Update = objutil.Update;
 
-    request.getConnection(function(err, connection) {
-        if (err) {
-            console.log("Error while connecting DB :" + err);
+
+    request.getConnection(function(error, connection) {
+
+        if (error) {
+            console.log("Error while connecting DB :" + error);
             response.send(error);
             return;
         } else {
-            ObjectDB.get_challans(connection, function(callback) {
-                if (callback) {
-                    var newsubstr = JSON.stringify(callback);
-                    if (newsubstr.indexOf("status") > -1 && newsubstr.indexOf("500") > -1 && newsubstr.indexOf("Internal server error") > -1) {
-                        response.send(error);
-                        return;
-                    } else {
-                        if (newsubstr.length > 0) {
-                            Result = '{"challans" : ' + JSON.stringify(callback) + '}';
-                            Result = Result.substring(0, Result.length - 1);
-                            Result = Result + ',' + '"status":200';
-                            Result = Result + ',' + '"message" :"success"' + '}';
-
-                            response.send(Result);
-                            return;
-                        } else {
-                            Result = failure;
-                            response.send(Result);
-                            return;
-                        }
-                    }
-                }
-            })
-        }
-    })
-}
-
-exports.Ws_get_challan_by_id = function(request, response) {
-
-    var objutil = require("./Utility.js");
-
-    var outPutData = "";
-    var success = objutil.Save;
-    var failure = objutil.Failure;
-    var invalidData = objutil.invalidData;
-    var delete1 = objutil.delete1;
-    var error = objutil.error;
-    var Update = objutil.Update;
-
-    if (request.body.data) {
-        try {
-            var reqJsonString = request.body.data;
-            var challanId = reqJsonString.chal_id;
-
-            if (challanId == "" || challanId == null || challanId == undefined) {
-                response.send(invalidData);
-                return;
-            }
-        } catch (err) {
-            var errMessage = err.message;
-            response.send(error);
-            return;
-        }
-    }
-
-    request.getConnection(function(err, connection) {
-
-        if (err) {
-            console.log("Error while connecting DB :" + err);
-            response.send(error);
-            return;
-        } else {
-            ObjectDB.get_challan_by_id(challanId, connection, function(callback) {
+            ObjectDB.get_diesel_entries(connection, function(callback) {
                 if (callback) {
                     var newsubstr = JSON.stringify(callback);
 
@@ -100,7 +39,7 @@ exports.Ws_get_challan_by_id = function(request, response) {
                         return;
                     } else {
                         if (newsubstr.length > 0) {
-                            Result = '{"challans" : ' + JSON.stringify(callback) + '}';
+                            Result = '{"dieselEntries" : ' + JSON.stringify(callback) + '}';
                             Result = Result.substring(0, Result.length - 1);
                             Result = Result + ',' + '"status":200';
                             Result = Result + ',' + '"message" :"success"' + '}';
@@ -117,10 +56,70 @@ exports.Ws_get_challan_by_id = function(request, response) {
             });
         }
     })
-};
+}
 
-//This web service is use to set customer details .
-exports.Ws_set_challan = function(request, response) {
+exports.Ws_get_diesel_entry_by_id = function(request, response) {
+    var objutil = require("./Utility.js");
+
+    var outPutData = "";
+    var success = objutil.Save;
+    var failure = objutil.Failure;
+    var invalidData = objutil.invalidData;
+    var delete1 = objutil.delete1;
+    var error = objutil.error;
+    var Update = objutil.Update;
+
+    if (request.body.data) {
+        try {
+            var reqJsonString = request.body.data;
+            var diesel_entry_id = reqJsonString.diesel_entry_id;
+            if (diesel_entry_id == "" || diesel_entry_id == null || diesel_entry_id == undefined) {
+                response.send(invalidData);
+                return;
+            }
+        } catch (error) {
+            var errMessage = error.message;
+            console.log("Error in data :" + errMessage);
+            response.send(error);
+            return;
+        }
+    }
+
+    request.getConnection(function(error, connection) {
+
+        if (error) {
+            console.log("Error while connecting DB :" + error);
+            response.send(error);
+            return;
+        } else {
+            ObjectDB.get_diesel_entry_by_id(diesel_entry_id, connection, function(callback) {
+                if (callback) {
+                    var newsubstr = JSON.stringify(callback);
+                    if (newsubstr.indexOf("status") > -1 && newsubstr.indexOf("500") > -1 && newsubstr.indexOf("Internal server error") > -1) {
+                        response.send(error);
+                        return;
+                    } else {
+                        if (callback.length > 0) {
+                            Result = '{"dieselEntries" : ' + JSON.stringify(callback) + '}';
+                            Result = Result.substring(0, Result.length - 1);
+                            Result = Result + ',' + '"status":200';
+                            Result = Result + ',' + '"message" :"success"' + '}';
+                            response.send(Result);
+                            return;
+                        } else {
+                            Result = failure;
+                            response.send(Result);
+                            return;
+                        }
+                    }
+                }
+            });
+        }
+    })
+}
+
+//This web service is used to set customer details
+exports.Ws_set_diesel_entry = function(request, response) {
 
     var objutil = require("./Utility.js");
 
@@ -135,17 +134,16 @@ exports.Ws_set_challan = function(request, response) {
     if (request.body.data) {
         try {
             var reqJsonString = request.body.data;
-            var chal_date = reqJsonString.chal_date;
-            var cust_id = reqJsonString.chal_cust_id;
-            var prod_id = reqJsonString.chal_prod_id;
-            var veh_id = reqJsonString.chal_veh_id;
-            var chal_qty = reqJsonString.chal_quantity;
-            var is_invoice_created = reqJsonString.chal_is_invoice_created;
-            if (chal_date == "" || chal_date == null || chal_date == undefined ||
-                cust_id == "" || cust_id == null || cust_id == undefined ||
-                prod_id == "" || prod_id == null || prod_id == undefined ||
-                veh_id == "" || veh_id == null || veh_id == undefined ||
-                chal_qty == "" || chal_qty == null || chal_qty == undefined) {
+
+            var diesel_filling_date = reqJsonString.diesel_filling_date;
+            var diesel_qty = reqJsonString.diesel_qty;
+            var diesel_amount = reqJsonString.diesel_amount;
+            var emp_id = reqJsonString.emp_id;
+
+            if (diesel_filling_date == "" || diesel_filling_date == null || diesel_filling_date == undefined ||
+                diesel_qty == "" || diesel_qty == null || diesel_qty == undefined ||
+                diesel_amount == "" || diesel_amount == null || diesel_amount == undefined ||
+                emp_id == "" || emp_id == null || emp_id == undefined) {
                 response.send(invalidData);
                 return;
             }
@@ -157,21 +155,20 @@ exports.Ws_set_challan = function(request, response) {
         }
     }
 
-    request.getConnection(function(error, connection) {
-        if (error) {
+    request.getConnection(function(err, connection) {
+
+        if (err) {
             response.send(error);
             return;
         } else {
-            ObjectDB.set_challan_detail(chal_date, chal_qty, cust_id, prod_id, veh_id, is_invoice_created, connection, function(callback) {
+            ObjectDB.set_diesel_entry(diesel_filling_date, diesel_qty, diesel_amount, emp_id, connection, function(callback) {
                 if (callback) {
-                    data = JSON.stringify(callback);
-
                     if (callback.affectedRows < 1) {
                         response.send(error);
                         return;
                     } else {
                         if (callback.insertId > 0) {
-                            Result = '{"status":200' + ',' + '"message" :"Challan added successfully."' + '}';
+                            Result = '{"status":200' + ',' + '"message" :"Diesel entry added successfully."' + '}';
                             response.send(Result);
                             return;
                         } else {
@@ -186,7 +183,9 @@ exports.Ws_set_challan = function(request, response) {
     })
 };
 
-exports.Ws_get_challans_by_customer_id = function(request, response) {
+
+//This web service is used to update diesel entries
+exports.Ws_update_diesel_entry = function(request, response) {
 
     var objutil = require("./Utility.js");
 
@@ -198,20 +197,26 @@ exports.Ws_get_challans_by_customer_id = function(request, response) {
     var error = objutil.error;
     var Update = objutil.Update;
 
-    var reqJsonString;
-    var customerId;
-
     if (request.body.data) {
         try {
-            reqJsonString = request.body.data;
-            customerId = reqJsonString.chal_cust_id;
+            var reqJsonString = request.body.data;
+            var diesel_entry_id = reqJsonString.diesel_entry_id;
+            var diesel_filling_date = reqJsonString.diesel_filling_date;
+            var diesel_qty = reqJsonString.diesel_qty;
+            var diesel_amount = reqJsonString.diesel_amount;
+            var emp_id = reqJsonString.emp_id;
 
-            if (customerId == "" || customerId == null || customerId == undefined) {
+            if (diesel_entry_id == "" || diesel_entry_id == null || diesel_entry_id == undefined ||
+                diesel_filling_date == "" || diesel_filling_date == null || diesel_filling_date == undefined ||
+                diesel_qty == "" || diesel_qty == null || diesel_qty == undefined ||
+                diesel_amount == "" || diesel_amount == null || diesel_amount == undefined ||
+                emp_id == "" || emp_id == null || emp_id == undefined) {
                 response.send(invalidData);
                 return;
             }
         } catch (err) {
             var errMessage = err.message;
+            console.log("Error in data :" + errMessage);
             response.send(error);
             return;
         }
@@ -220,24 +225,18 @@ exports.Ws_get_challans_by_customer_id = function(request, response) {
     request.getConnection(function(err, connection) {
 
         if (err) {
-            console.log("Error while connecting DB :" + err);
             response.send(error);
             return;
         } else {
-            ObjectDB.get_challans_by_customer_id(customerId, connection, function(callback) {
+            ObjectDB.update_diesel_entry(diesel_entry_id, diesel_filling_date, diesel_qty, diesel_amount, emp_id, connection, function(callback) {
                 if (callback) {
-                    var newsubstr = JSON.stringify(callback);
 
-                    if (newsubstr.indexOf("status") > -1 && newsubstr.indexOf("500") > -1 && newsubstr.indexOf("Internal server error") > -1) {
+                    if (callback.affectedRows < 1) {
                         response.send(error);
                         return;
                     } else {
-                        if (callback.length > 0) {
-                            Result = '{"challans" : ' + JSON.stringify(callback) + '}';
-                            Result = Result.substring(0, Result.length - 1);
-                            Result = Result + ',' + '"status":200';
-                            Result = Result + ',' + '"message" :"success"' + '}';
-
+                        if (callback.affectedRows > 0) {
+                            Result = '{"status":200' + ',' + '"message" :"Diesel entry updated successfully."' + '}';
                             response.send(Result);
                             return;
                         } else {
@@ -247,7 +246,65 @@ exports.Ws_get_challans_by_customer_id = function(request, response) {
                         }
                     }
                 }
-            })
+            });
         }
     })
-}
+};
+
+
+exports.Ws_delete_diesel_entry = function(request, response) {
+
+    var objutil = require("./Utility.js");
+
+    var outPutData = "";
+    var success = objutil.Save;
+    var failure = objutil.Failure;
+    var invalidData = objutil.invalidData;
+    var delete1 = objutil.delete1;
+    var error = objutil.error;
+    var Update = objutil.Update;
+
+    if (request.body.data) {
+        try {
+            var reqJsonString = request.body.data;
+            var diesel_entry_id = reqJsonString.diesel_entry_id;
+            if (diesel_entry_id == "" || diesel_entry_id == null || diesel_entry_id == undefined) {
+                response.send(invalidData);
+                return;
+            }
+        } catch (err) {
+            var errMessage = err.message;
+            console.log("Error in data :" + errMessage);
+            response.send(error);
+            return;
+        }
+    }
+
+    request.getConnection(function(err, connection) {
+
+        if (err) {
+            response.send(error);
+            return;
+        } else {
+            ObjectDB.delete_diesel_entry(diesel_entry_id, connection, function(callback) {
+                if (callback) {
+                    if (callback.code === 'ER_ROW_IS_REFERENCED_2') {
+                        deleteError = '{"status":501' + ',' + '"message" :"Cannot delete diesel entry as it is used in Invoicing."' + '}';
+                        response.send(deleteError);
+                        return;
+                    } else {
+                        if (callback.affectedRows > 0) {
+                            Result = '{"status":200' + ',' + '"message" :"Diesel entry deleted successfully."' + '}';
+                            response.send(Result);
+                            return;
+                        } else {
+                            Result = failure;
+                            response.send(Result);
+                            return;
+                        }
+                    }
+                }
+            });
+        }
+    })
+};

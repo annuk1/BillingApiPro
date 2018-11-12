@@ -1,4 +1,3 @@
-//Declaration
 var express = require("express");
 var app = express();
 var bodyParser = require("body-parser");
@@ -11,7 +10,7 @@ var http = require('http');
 var ObjDB = require("./DataAccess.js");
 var ObjectDB = new ObjDB();
 
-exports.Ws_get_challans = function(request, response) {
+exports.Ws_get_payment_details = function(request, response) {
 
     var objutil = require("./Utility.js");
 
@@ -23,66 +22,6 @@ exports.Ws_get_challans = function(request, response) {
     var error = objutil.error;
     var Update = objutil.Update;
 
-    request.getConnection(function(err, connection) {
-        if (err) {
-            console.log("Error while connecting DB :" + err);
-            response.send(error);
-            return;
-        } else {
-            ObjectDB.get_challans(connection, function(callback) {
-                if (callback) {
-                    var newsubstr = JSON.stringify(callback);
-                    if (newsubstr.indexOf("status") > -1 && newsubstr.indexOf("500") > -1 && newsubstr.indexOf("Internal server error") > -1) {
-                        response.send(error);
-                        return;
-                    } else {
-                        if (newsubstr.length > 0) {
-                            Result = '{"challans" : ' + JSON.stringify(callback) + '}';
-                            Result = Result.substring(0, Result.length - 1);
-                            Result = Result + ',' + '"status":200';
-                            Result = Result + ',' + '"message" :"success"' + '}';
-
-                            response.send(Result);
-                            return;
-                        } else {
-                            Result = failure;
-                            response.send(Result);
-                            return;
-                        }
-                    }
-                }
-            })
-        }
-    })
-}
-
-exports.Ws_get_challan_by_id = function(request, response) {
-
-    var objutil = require("./Utility.js");
-
-    var outPutData = "";
-    var success = objutil.Save;
-    var failure = objutil.Failure;
-    var invalidData = objutil.invalidData;
-    var delete1 = objutil.delete1;
-    var error = objutil.error;
-    var Update = objutil.Update;
-
-    if (request.body.data) {
-        try {
-            var reqJsonString = request.body.data;
-            var challanId = reqJsonString.chal_id;
-
-            if (challanId == "" || challanId == null || challanId == undefined) {
-                response.send(invalidData);
-                return;
-            }
-        } catch (err) {
-            var errMessage = err.message;
-            response.send(error);
-            return;
-        }
-    }
 
     request.getConnection(function(err, connection) {
 
@@ -91,7 +30,7 @@ exports.Ws_get_challan_by_id = function(request, response) {
             response.send(error);
             return;
         } else {
-            ObjectDB.get_challan_by_id(challanId, connection, function(callback) {
+            ObjectDB.get_payment_details(connection, function(callback) {
                 if (callback) {
                     var newsubstr = JSON.stringify(callback);
 
@@ -100,7 +39,7 @@ exports.Ws_get_challan_by_id = function(request, response) {
                         return;
                     } else {
                         if (newsubstr.length > 0) {
-                            Result = '{"challans" : ' + JSON.stringify(callback) + '}';
+                            Result = '{"paymentDetails" : ' + JSON.stringify(callback) + '}';
                             Result = Result.substring(0, Result.length - 1);
                             Result = Result + ',' + '"status":200';
                             Result = Result + ',' + '"message" :"success"' + '}';
@@ -117,11 +56,9 @@ exports.Ws_get_challan_by_id = function(request, response) {
             });
         }
     })
-};
+}
 
-//This web service is use to set customer details .
-exports.Ws_set_challan = function(request, response) {
-
+exports.Ws_get_payment_detail_by_id = function(request, response) {
     var objutil = require("./Utility.js");
 
     var outPutData = "";
@@ -135,17 +72,8 @@ exports.Ws_set_challan = function(request, response) {
     if (request.body.data) {
         try {
             var reqJsonString = request.body.data;
-            var chal_date = reqJsonString.chal_date;
-            var cust_id = reqJsonString.chal_cust_id;
-            var prod_id = reqJsonString.chal_prod_id;
-            var veh_id = reqJsonString.chal_veh_id;
-            var chal_qty = reqJsonString.chal_quantity;
-            var is_invoice_created = reqJsonString.chal_is_invoice_created;
-            if (chal_date == "" || chal_date == null || chal_date == undefined ||
-                cust_id == "" || cust_id == null || cust_id == undefined ||
-                prod_id == "" || prod_id == null || prod_id == undefined ||
-                veh_id == "" || veh_id == null || veh_id == undefined ||
-                chal_qty == "" || chal_qty == null || chal_qty == undefined) {
+            var payment_id = reqJsonString.payment_id;
+            if (payment_id == "" || payment_id == null || payment_id == undefined) {
                 response.send(invalidData);
                 return;
             }
@@ -158,20 +86,89 @@ exports.Ws_set_challan = function(request, response) {
     }
 
     request.getConnection(function(error, connection) {
+
         if (error) {
+            console.log("Error while connecting DB :" + error);
             response.send(error);
             return;
         } else {
-            ObjectDB.set_challan_detail(chal_date, chal_qty, cust_id, prod_id, veh_id, is_invoice_created, connection, function(callback) {
+            ObjectDB.get_payment_detail_by_id(payment_id, connection, function(callback) {
                 if (callback) {
-                    data = JSON.stringify(callback);
+                    var newsubstr = JSON.stringify(callback);
+                    if (newsubstr.indexOf("status") > -1 && newsubstr.indexOf("500") > -1 && newsubstr.indexOf("Internal server error") > -1) {
+                        response.send(error);
+                        return;
+                    } else {
+                        if (callback.length > 0) {
+                            Result = '{"paymentDetails" : ' + JSON.stringify(callback) + '}';
+                            Result = Result.substring(0, Result.length - 1);
+                            Result = Result + ',' + '"status":200';
+                            Result = Result + ',' + '"message" :"success"' + '}';
+                            response.send(Result);
+                            return;
+                        } else {
+                            Result = failure;
+                            response.send(Result);
+                            return;
+                        }
+                    }
+                }
+            });
+        }
+    })
+}
 
+//This web service is used to set payment details
+exports.Ws_set_payment_detail = function(request, response) {
+
+    var objutil = require("./Utility.js");
+
+    var outPutData = "";
+    var success = objutil.Save;
+    var failure = objutil.Failure;
+    var invalidData = objutil.invalidData;
+    var delete1 = objutil.delete1;
+    var error = objutil.error;
+    var Update = objutil.Update;
+    if (request.body.data) {
+        try {
+            var reqJsonString = request.body.data;
+            var payment_date = reqJsonString.payment_date;
+            var emp_id = reqJsonString.emp_id;
+            var payment_amount = reqJsonString.payment_amount;
+            var payment_mode = reqJsonString.payment_mode;
+            var payment_type = reqJsonString.payment_type;
+
+            if (payment_date == "" || payment_date == null || payment_date == undefined ||
+                emp_id == "" || emp_id == null || emp_id == undefined ||
+                payment_amount == "" || payment_amount == null || payment_amount == undefined ||
+                payment_mode == "" || payment_mode == null || payment_mode == undefined ||
+                payment_type == "" || payment_type == null || payment_type == undefined) {
+                response.send(invalidData);
+                return;
+            }
+        } catch (err) {
+            var errMessage = err.message;
+            console.log("Error in data :" + errMessage);
+            response.send(error);
+            return;
+        }
+    }
+
+    request.getConnection(function(err, connection) {
+
+        if (err) {
+            response.send(error);
+            return;
+        } else {
+            ObjectDB.set_payment_detail(payment_date, emp_id, payment_amount, payment_mode, payment_type, connection, function(callback) {
+                if (callback) {
                     if (callback.affectedRows < 1) {
                         response.send(error);
                         return;
                     } else {
                         if (callback.insertId > 0) {
-                            Result = '{"status":200' + ',' + '"message" :"Challan added successfully."' + '}';
+                            Result = '{"status":200' + ',' + '"message" :"Payment detail added successfully."' + '}';
                             response.send(Result);
                             return;
                         } else {
@@ -186,7 +183,9 @@ exports.Ws_set_challan = function(request, response) {
     })
 };
 
-exports.Ws_get_challans_by_customer_id = function(request, response) {
+
+//This web service is used to set customer details
+exports.Ws_update_payment_detail = function(request, response) {
 
     var objutil = require("./Utility.js");
 
@@ -198,20 +197,27 @@ exports.Ws_get_challans_by_customer_id = function(request, response) {
     var error = objutil.error;
     var Update = objutil.Update;
 
-    var reqJsonString;
-    var customerId;
-
     if (request.body.data) {
         try {
-            reqJsonString = request.body.data;
-            customerId = reqJsonString.chal_cust_id;
-
-            if (customerId == "" || customerId == null || customerId == undefined) {
+            var reqJsonString = request.body.data;
+            var cheque_entry_id = reqJsonString.cheque_entry_id;
+            var cheque_date = reqJsonString.cheque_date;
+            var cheque_number = reqJsonString.cheque_number;
+            var cheque_amount = reqJsonString.cheque_amount;
+            var account_no = reqJsonString.account_no;
+            var cheque_cust_id = reqJsonString.cheque_cust_id;
+            if (cheque_entry_id == "" || cheque_entry_id == null || cheque_entry_id == undefined ||
+                cheque_date == "" || cheque_date == null || cheque_date == undefined ||
+                cheque_number == "" || cheque_number == null || cheque_number == undefined ||
+                cheque_amount == "" || cheque_amount == null || cheque_amount == undefined ||
+                account_no == "" || account_no == null || account_no == undefined ||
+                cheque_cust_id == "" || cheque_cust_id == null || cheque_cust_id == undefined) {
                 response.send(invalidData);
                 return;
             }
         } catch (err) {
             var errMessage = err.message;
+            console.log("Error in data :" + errMessage);
             response.send(error);
             return;
         }
@@ -220,24 +226,18 @@ exports.Ws_get_challans_by_customer_id = function(request, response) {
     request.getConnection(function(err, connection) {
 
         if (err) {
-            console.log("Error while connecting DB :" + err);
             response.send(error);
             return;
         } else {
-            ObjectDB.get_challans_by_customer_id(customerId, connection, function(callback) {
+            ObjectDB.update_payment_detail(cheque_entry_id, cheque_date, cheque_number, cheque_amount, account_no, cheque_cust_id, connection, function(callback) {
                 if (callback) {
-                    var newsubstr = JSON.stringify(callback);
 
-                    if (newsubstr.indexOf("status") > -1 && newsubstr.indexOf("500") > -1 && newsubstr.indexOf("Internal server error") > -1) {
+                    if (callback.affectedRows < 1) {
                         response.send(error);
                         return;
                     } else {
-                        if (callback.length > 0) {
-                            Result = '{"challans" : ' + JSON.stringify(callback) + '}';
-                            Result = Result.substring(0, Result.length - 1);
-                            Result = Result + ',' + '"status":200';
-                            Result = Result + ',' + '"message" :"success"' + '}';
-
+                        if (callback.affectedRows > 0) {
+                            Result = '{"status":200' + ',' + '"message" :"Cheque entry updated successfully."' + '}';
                             response.send(Result);
                             return;
                         } else {
@@ -247,7 +247,65 @@ exports.Ws_get_challans_by_customer_id = function(request, response) {
                         }
                     }
                 }
-            })
+            });
         }
     })
-}
+};
+
+
+exports.Ws_delete_payment_detail = function(request, response) {
+
+    var objutil = require("./Utility.js");
+
+    var outPutData = "";
+    var success = objutil.Save;
+    var failure = objutil.Failure;
+    var invalidData = objutil.invalidData;
+    var delete1 = objutil.delete1;
+    var error = objutil.error;
+    var Update = objutil.Update;
+
+    if (request.body.data) {
+        try {
+            var reqJsonString = request.body.data;
+            var payment_id = reqJsonString.payment_id;
+            if (payment_id == "" || payment_id == null || payment_id == undefined) {
+                response.send(invalidData);
+                return;
+            }
+        } catch (err) {
+            var errMessage = err.message;
+            console.log("Error in data :" + errMessage);
+            response.send(error);
+            return;
+        }
+    }
+
+    request.getConnection(function(err, connection) {
+
+        if (err) {
+            response.send(error);
+            return;
+        } else {
+            ObjectDB.delete_payment_detail(payment_id, connection, function(callback) {
+                if (callback) {
+                    if (callback.code === 'ER_ROW_IS_REFERENCED_2') {
+                        deleteError = '{"status":501' + ',' + '"message" :"Cannot delete payment detail as it is used in Invoicing."' + '}';
+                        response.send(deleteError);
+                        return;
+                    } else {
+                        if (callback.affectedRows > 0) {
+                            Result = '{"status":200' + ',' + '"message" :"Payment detail deleted successfully."' + '}';
+                            response.send(Result);
+                            return;
+                        } else {
+                            Result = failure;
+                            response.send(Result);
+                            return;
+                        }
+                    }
+                }
+            });
+        }
+    })
+};

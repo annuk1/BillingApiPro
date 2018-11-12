@@ -11,7 +11,7 @@ var http = require('http');
 var ObjDB = require("./DataAccess.js");
 var ObjectDB = new ObjDB();
 
-exports.Ws_get_purchases = function (request, response) {
+exports.Ws_get_purchases = function(request, response) {
 
     var objutil = require("./Utility.js");
 
@@ -24,14 +24,14 @@ exports.Ws_get_purchases = function (request, response) {
     var Update = objutil.Update;
 
 
-    request.getConnection(function (err, connection) {
+    request.getConnection(function(err, connection) {
 
         if (err) {
             console.log("Error while connecting DB :" + err);
             response.send(error);
             return;
         } else {
-            ObjectDB.get_purchases(connection, function (callback) {
+            ObjectDB.get_purchases(connection, function(callback) {
                 if (callback) {
                     data = callback;
                     var Arr_Temp = data;
@@ -61,7 +61,7 @@ exports.Ws_get_purchases = function (request, response) {
     })
 }
 
-exports.Ws_get_purchase_by_id = function (request, response) {
+exports.Ws_get_purchase_by_id = function(request, response) {
 
     var objutil = require("./Utility.js");
 
@@ -91,14 +91,14 @@ exports.Ws_get_purchase_by_id = function (request, response) {
         }
     }
 
-    request.getConnection(function (err, connection) {
+    request.getConnection(function(err, connection) {
 
         if (err) {
             console.log("Error while connecting DB :" + err);
             response.send(error);
             return;
         } else {
-            ObjectDB.get_purchase_by_id(pur_id, connection, function (callback) {
+            ObjectDB.get_purchase_by_id(pur_id, connection, function(callback) {
                 if (callback) {
                     data = callback;
                     var Arr_Temp = data;
@@ -129,7 +129,7 @@ exports.Ws_get_purchase_by_id = function (request, response) {
 }
 
 //This web service is used to set quatation details
-exports.Ws_set_purchase = function (request, response) {
+exports.Ws_set_purchase = function(request, response) {
 
     var objutil = require("./Utility.js");
 
@@ -165,13 +165,13 @@ exports.Ws_set_purchase = function (request, response) {
         }
     }
 
-    request.getConnection(function (err, connection) {
+    request.getConnection(function(err, connection) {
 
         if (err) {
             response.send(error);
             return;
         } else {
-            ObjectDB.set_purchase_detail(pur_date, pur_total_amount, pur_vend_id,pur_products, connection, function (callback) {
+            ObjectDB.set_purchase_detail(pur_date, pur_total_amount, pur_vend_id, pur_products, connection, function(callback) {
                 if (callback) {
                     data = JSON.stringify(callback);
 
@@ -195,7 +195,7 @@ exports.Ws_set_purchase = function (request, response) {
     })
 };
 
-exports.Ws_get_purchase_products = function (request, response) {
+exports.Ws_get_purchase_products = function(request, response) {
 
     var objutil = require("./Utility.js");
 
@@ -207,14 +207,14 @@ exports.Ws_get_purchase_products = function (request, response) {
     var error = objutil.error;
     var Update = objutil.Update;
 
-    request.getConnection(function (err, connection) {
+    request.getConnection(function(err, connection) {
 
         if (err) {
             console.log("Error while connecting DB :" + err);
             response.send(error);
             return;
         } else {
-            ObjectDB.Ws_get_purchase_products(connection, function (callback) {
+            ObjectDB.Ws_get_purchase_products(connection, function(callback) {
                 if (callback) {
                     data = callback;
                     var Arr_Temp = data;
@@ -225,7 +225,7 @@ exports.Ws_get_purchase_products = function (request, response) {
                         return;
                     } else {
                         if (data.length > 0) {
-                            Result = '{"purchase" : ' + JSON.stringify(data) + '}';
+                            Result = '{"products" : ' + JSON.stringify(data) + '}';
                             Result = Result.substring(0, Result.length - 1);
                             Result = Result + ',' + '"status":200';
                             Result = Result + ',' + '"message" :"success"' + '}';
@@ -244,7 +244,7 @@ exports.Ws_get_purchase_products = function (request, response) {
     })
 };
 
-exports.Ws_get_purchase_products_by_id = function (request, response) {
+exports.Ws_get_purchase_products_by_id = function(request, response) {
 
     var objutil = require("./Utility.js");
 
@@ -274,14 +274,14 @@ exports.Ws_get_purchase_products_by_id = function (request, response) {
         }
     }
 
-    request.getConnection(function (err, connection) {
+    request.getConnection(function(err, connection) {
 
         if (err) {
             console.log("Error while connecting DB :" + err);
             response.send(error);
             return;
         } else {
-            ObjectDB.Ws_get_purchase_products_by_id(pur_id, connection, function (callback) {
+            ObjectDB.Ws_get_purchase_products_by_id(pur_id, connection, function(callback) {
                 if (callback) {
                     data = callback;
                     var Arr_Temp = data;

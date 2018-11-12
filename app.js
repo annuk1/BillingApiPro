@@ -72,7 +72,9 @@ var Wscall_Invoice = require('./routes/InvoiceWebService.js');
 var Wscall_Vehicle = require('./routes/VehicleWebService.js');
 var Wscall_GST = require('./routes/GSTWebService.js');
 var Wscall_Cheque = require('./routes/ChequeWebService.js');
-
+var Wscall_Employee = require('./routes/EmployeeWebService.js');
+var Wscall_Diesel = require('./routes/DieselEntryWebService.js');
+var Wscall_Payment = require('./routes/PaymentWebService.js');
 
 // Customer web services
 app.post('/getCustomers', Wscall_Customer.Ws_get_customers);
@@ -139,6 +141,27 @@ app.post('/getChequeEntryById', Wscall_Cheque.Ws_get_cheque_entry_by_id);
 app.post('/addChequeEntry', Wscall_Cheque.Ws_set_cheque_entry);
 app.post('/updateChequeEntry', Wscall_Cheque.Ws_update_cheque_entry);
 app.post('/deleteChequeEntry', Wscall_Cheque.Ws_delete_cheque_entry);
+
+// Employee web services
+app.post('/getEmployees', Wscall_Employee.Ws_get_employees);
+app.post('/getEmployeeById', Wscall_Employee.Ws_get_employee_by_id);
+app.post('/addEmployee', Wscall_Employee.Ws_set_employee);
+app.post('/updateEmployee', Wscall_Employee.Ws_update_employee);
+app.post('/deleteEmployee', Wscall_Employee.Ws_delete_employee);
+
+// Diesel Entry web services
+app.post('/getDieselEntries', Wscall_Diesel.Ws_get_diesel_entries);
+app.post('/getDieselEntryById', Wscall_Diesel.Ws_get_diesel_entry_by_id);
+app.post('/addDieselEntry', Wscall_Diesel.Ws_set_diesel_entry);
+app.post('/updateDieselEntry', Wscall_Diesel.Ws_update_diesel_entry);
+app.post('/deleteDieselEntry', Wscall_Diesel.Ws_delete_diesel_entry);
+
+// Payment Detail web services
+app.post('/getPaymentDetails', Wscall_Payment.Ws_get_payment_details);
+app.post('/getPaymentDetailById', Wscall_Payment.Ws_get_payment_detail_by_id);
+app.post('/addPaymentDetail', Wscall_Payment.Ws_set_payment_detail);
+app.post('/updatePaymentDetail', Wscall_Payment.Ws_update_payment_detail);
+app.post('/deletePaymentDetail', Wscall_Payment.Ws_delete_payment_detail);
 
 var port = process.env.PORT || 3000;
 app.listen(port);
