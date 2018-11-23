@@ -137,13 +137,11 @@ exports.Ws_set_invoice = function(request, response) {
     var error = objutil.error;
     var Update = objutil.Update;
 
-
     var reqJsonString;
 
     if (request.body.data) {
         try {
             var reqJsonString = request.body.data;
-            console.log("Invoice request:" + JSON.stringify(reqJsonString));
             var inv_date = reqJsonString.inv_date;
             var cust_id = reqJsonString.inv_cust_id;
             var inv_total = reqJsonString.inv_total_amount;
@@ -154,7 +152,6 @@ exports.Ws_set_invoice = function(request, response) {
                 cust_id == "" || cust_id == null || cust_id == undefined ||
                 inv_total == "" || inv_total == null || inv_total == undefined ||
                 inv_products == null || inv_products == undefined) {
-                console.log("Invoice Date" + inv_date);
                 response.send(invalidData);
                 return;
             }
