@@ -140,6 +140,7 @@ exports.Ws_set_customer = function(request, response) {
             var cust_email = reqJsonString.cust_email;
             var cust_address = reqJsonString.cust_address;
             var cust_contact_person = reqJsonString.cust_contact_person;
+            var cust_gst_no = reqJsonString.cust_gst_no;
             if (cust_name == "" || cust_name == null || cust_name == undefined ||
                 cust_contact == "" || cust_contact == null || cust_contact == undefined ||
                 cust_contact_person == "" || cust_contact_person == null || cust_contact_person == undefined ||
@@ -162,7 +163,7 @@ exports.Ws_set_customer = function(request, response) {
             response.send(error);
             return;
         } else {
-            ObjectDB.set_customer_detail(cust_name, cust_contact_person, cust_contact, cust_email, cust_address, connection, function(callback) {
+            ObjectDB.set_customer_detail(cust_name, cust_contact_person, cust_contact, cust_email, cust_address, cust_gst_no, connection, function(callback) {
                 if (callback) {
                     data = JSON.stringify(callback);
 
@@ -209,6 +210,8 @@ exports.Ws_update_customer = function(request, response) {
             var cust_contact = reqJsonString.cust_contact;
             var cust_email = reqJsonString.cust_email;
             var cust_address = reqJsonString.cust_address;
+            var cust_gst_no = reqJsonString.cust_gst_no;
+
             if (cust_id == "" || cust_id == null || cust_id == undefined ||
                 cust_name == "" || cust_name == null || cust_name == undefined ||
                 cust_contact_person == "" || cust_contact_person == null || cust_contact_person == undefined ||
@@ -232,7 +235,7 @@ exports.Ws_update_customer = function(request, response) {
             response.send(error);
             return;
         } else {
-            ObjectDB.update_customer_detail(cust_id, cust_name, cust_contact_person, cust_contact, cust_email, cust_address, connection, function(callback) {
+            ObjectDB.update_customer_detail(cust_id, cust_name, cust_contact_person, cust_contact, cust_email, cust_address, cust_gst_no, connection, function(callback) {
                 if (callback) {
                     if (callback.affectedRows < 1) {
                         response.send(error);

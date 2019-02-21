@@ -123,13 +123,9 @@ exports.Ws_set_diesel_entry = function(request, response) {
 
     var objutil = require("./Utility.js");
 
-    var outPutData = "";
-    var success = objutil.Save;
     var failure = objutil.Failure;
     var invalidData = objutil.invalidData;
-    var delete1 = objutil.delete1;
     var error = objutil.error;
-    var Update = objutil.Update;
 
     if (request.body.data) {
         try {
@@ -139,11 +135,13 @@ exports.Ws_set_diesel_entry = function(request, response) {
             var diesel_qty = reqJsonString.diesel_qty;
             var diesel_amount = reqJsonString.diesel_amount;
             var emp_id = reqJsonString.emp_id;
+            var veh_id = reqJsonString.veh_id;
 
             if (diesel_filling_date == "" || diesel_filling_date == null || diesel_filling_date == undefined ||
                 diesel_qty == "" || diesel_qty == null || diesel_qty == undefined ||
                 diesel_amount == "" || diesel_amount == null || diesel_amount == undefined ||
-                emp_id == "" || emp_id == null || emp_id == undefined) {
+                emp_id == "" || emp_id == null || emp_id == undefined ||
+                veh_id == "" || veh_id == null || veh_id == undefined) {
                 response.send(invalidData);
                 return;
             }
@@ -161,7 +159,7 @@ exports.Ws_set_diesel_entry = function(request, response) {
             response.send(error);
             return;
         } else {
-            ObjectDB.set_diesel_entry(diesel_filling_date, diesel_qty, diesel_amount, emp_id, connection, function(callback) {
+            ObjectDB.set_diesel_entry(diesel_filling_date, diesel_qty, diesel_amount, emp_id, veh_id, connection, function(callback) {
                 if (callback) {
                     if (callback.affectedRows < 1) {
                         response.send(error);
@@ -189,13 +187,9 @@ exports.Ws_update_diesel_entry = function(request, response) {
 
     var objutil = require("./Utility.js");
 
-    var outPutData = "";
-    var success = objutil.Save;
     var failure = objutil.Failure;
     var invalidData = objutil.invalidData;
-    var delete1 = objutil.delete1;
     var error = objutil.error;
-    var Update = objutil.Update;
 
     if (request.body.data) {
         try {
@@ -205,12 +199,14 @@ exports.Ws_update_diesel_entry = function(request, response) {
             var diesel_qty = reqJsonString.diesel_qty;
             var diesel_amount = reqJsonString.diesel_amount;
             var emp_id = reqJsonString.emp_id;
+            var veh_id = reqJsonString.veh_id;
 
             if (diesel_entry_id == "" || diesel_entry_id == null || diesel_entry_id == undefined ||
                 diesel_filling_date == "" || diesel_filling_date == null || diesel_filling_date == undefined ||
                 diesel_qty == "" || diesel_qty == null || diesel_qty == undefined ||
                 diesel_amount == "" || diesel_amount == null || diesel_amount == undefined ||
-                emp_id == "" || emp_id == null || emp_id == undefined) {
+                emp_id == "" || emp_id == null || emp_id == undefined ||
+                veh_id == "" || veh_id == null || veh_id == undefined) {
                 response.send(invalidData);
                 return;
             }
@@ -228,7 +224,7 @@ exports.Ws_update_diesel_entry = function(request, response) {
             response.send(error);
             return;
         } else {
-            ObjectDB.update_diesel_entry(diesel_entry_id, diesel_filling_date, diesel_qty, diesel_amount, emp_id, connection, function(callback) {
+            ObjectDB.update_diesel_entry(diesel_entry_id, diesel_filling_date, diesel_qty, diesel_amount, emp_id, veh_id, connection, function(callback) {
                 if (callback) {
 
                     if (callback.affectedRows < 1) {
@@ -255,14 +251,9 @@ exports.Ws_update_diesel_entry = function(request, response) {
 exports.Ws_delete_diesel_entry = function(request, response) {
 
     var objutil = require("./Utility.js");
-
-    var outPutData = "";
-    var success = objutil.Save;
     var failure = objutil.Failure;
     var invalidData = objutil.invalidData;
-    var delete1 = objutil.delete1;
     var error = objutil.error;
-    var Update = objutil.Update;
 
     if (request.body.data) {
         try {

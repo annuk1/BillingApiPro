@@ -19,8 +19,8 @@ getData.prototype.get_customers = function(connection, callback) {
     })
 }
 
-getData.prototype.set_customer_detail = function(cust_name, cust_contact_person, cust_contact, cust_email, cust_address, connection, callback) {
-    var sql = "INSERT INTO customers VALUES (null,'" + cust_name + "','" + cust_contact_person + "','" + cust_contact + "','" + cust_email + "','" + cust_address + "')";
+getData.prototype.set_customer_detail = function(cust_name, cust_contact_person, cust_contact, cust_email, cust_address, cust_gst_no, connection, callback) {
+    var sql = "INSERT INTO customers VALUES (null,'" + cust_name + "','" + cust_contact_person + "','" + cust_contact + "','" + cust_email + "','" + cust_address + "','" + cust_gst_no + "')";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -30,8 +30,8 @@ getData.prototype.set_customer_detail = function(cust_name, cust_contact_person,
     })
 }
 
-getData.prototype.update_customer_detail = function(cust_id, cust_name, cust_contact_person, cust_contact, cust_email, cust_address, connection, callback) {
-    var sql = "UPDATE customers SET cust_name='" + cust_name + "', cust_contact_person='" + cust_contact_person + "', cust_contact='" + cust_contact + "', cust_email='" + cust_email + "', cust_address='" + cust_address + "' WHERE cust_id = '" + cust_id + "'";
+getData.prototype.update_customer_detail = function(cust_id, cust_name, cust_contact_person, cust_contact, cust_email, cust_address, cust_gst_no, connection, callback) {
+    var sql = "UPDATE customers SET cust_name='" + cust_name + "', cust_contact_person='" + cust_contact_person + "', cust_contact='" + cust_contact + "', cust_email='" + cust_email + "', cust_address='" + cust_address + "', cust_gst_no='" + cust_gst_no + "' WHERE cust_id = '" + cust_id + "'";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -297,7 +297,7 @@ getData.prototype.get_challans = function(connection, callback) {
 }
 
 getData.prototype.get_challan_by_id = function(challanId, connection, callback) {
-    var sql = "SELECT challans.chal_id, challans.chal_no, challans.chal_date, challans.chal_veh_id, challans.chal_quantity, customers.cust_name AS chal_cust_name, customers.cust_address AS chal_cust_address, vehicles.veh_number AS chal_veh_no, products.prod_name AS chal_prod_name, products.prod_unit AS chal_prod_unit FROM challans, customers, vehicles, products WHERE challans.chal_cust_id=customers.cust_id && challans.chal_veh_id = vehicles.veh_id && challans.chal_prod_id = products.prod_id && chal_id = '" + challanId + "'";
+    var sql = "SELECT challans.chal_id, challans.chal_no, challans.chal_date, challans.chal_veh_id, challans.chal_prod_id, challans.chal_quantity, challans.chal_cust_id, customers.cust_name AS chal_cust_name, customers.cust_address AS chal_cust_address, vehicles.veh_number AS chal_veh_no, products.prod_name AS chal_prod_name, products.prod_unit AS chal_prod_unit FROM challans, customers, vehicles, products WHERE challans.chal_cust_id=customers.cust_id && challans.chal_veh_id = vehicles.veh_id && challans.chal_prod_id = products.prod_id && chal_id = '" + challanId + "'";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -329,8 +329,8 @@ getData.prototype.get_challans_by_customer_id = function(customerId, connection,
     })
 }
 
-getData.prototype.update_challan_detail = function(chal_id, chal_no, chal_date, chal_cust_id, chal_prod_id, chal_veh_id, chal_qty, connection, callback) {
-    var sql = "UPDATE cheque_entries SET chal_no='" + chal_no + "', chal_date='" + chal_date + "', chal_qty = '" + chal_qty + "', chal_cust_id = '" + chal_cust_id + "', chal_prod_id = '" + chal_prod_id + "', chal_veh_id = '" + chal_veh_id + "' WHERE chal_id = '" + chal_id + "')";
+getData.prototype.update_challan_detail = function(chal_id, chal_no, chal_date, chal_qty, chal_cust_id, chal_prod_id, chal_veh_id, connection, callback) {
+    var sql = "UPDATE challans SET chal_no='" + chal_no + "', chal_date='" + chal_date + "', chal_quantity = '" + chal_qty + "', chal_cust_id = '" + chal_cust_id + "', chal_prod_id = '" + chal_prod_id + "', chal_veh_id = '" + chal_veh_id + "' WHERE chal_id = '" + chal_id + "'";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -341,7 +341,7 @@ getData.prototype.update_challan_detail = function(chal_id, chal_no, chal_date, 
 }
 
 getData.prototype.get_quatations = function(connection, callback) {
-    var sql = "select quatations.quat_id, quatations.quat_date, customers.cust_name AS quat_customer, customers.cust_address AS quat_address, customers.cust_contact AS quat_contact, customers.cust_contact_person AS quat_contact_person from customers, quatations WHERE customers.cust_id=quatations.quat_cust_id";
+    var sql = "select quatations.quat_id, quatations.quat_date, quatations.quat_cust_name AS quat_customer, quatations.quat_cust_address AS quat_address, quatations.quat_cont_no AS quat_contact, quatations.quat_cont_person AS quat_contact_person from quatations";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -352,7 +352,7 @@ getData.prototype.get_quatations = function(connection, callback) {
 }
 
 getData.prototype.get_quatation_by_id = function(quat_id, connection, callback) {
-    var sql = "select quatations.quat_id, quatations.quat_date, customers.cust_name AS quat_customer, customers.cust_address AS quat_address, customers.cust_contact AS quat_contact, customers.cust_contact_person AS quat_contact_person from customers, quatations WHERE customers.cust_id=quatations.quat_cust_id && quat_id = '" + quat_id + "'";
+    var sql = "select quatations.quat_id, quatations.quat_date, quatations.quat_cust_name AS quat_customer, quatations.quat_cust_address AS quat_address, quatations.quat_cont_no AS quat_contact, quatations.quat_cont_person AS quat_contact_person from quatations WHERE quat_id = '" + quat_id + "'";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -362,13 +362,13 @@ getData.prototype.get_quatation_by_id = function(quat_id, connection, callback) 
     })
 }
 
-getData.prototype.set_quatation_detail = function(quat_date, quat_cust_id, quat_products, connection, callback) {
+getData.prototype.set_quatation_detail = function(quat_date, cust_name, cust_address, cust_cont_person, cust_cont_no, quat_products, connection, callback) {
 
     connection.beginTransaction(function(error) {
         if (error) {
             callback(error);
         } else {
-            var sql = "INSERT INTO quatations VALUES (null,'" + quat_date + "','" + quat_cust_id + "')";
+            var sql = "INSERT INTO quatations VALUES (null,'" + quat_date + "','" + cust_name + "','" + cust_address + "','" + cust_cont_person + "','" + cust_cont_no + "')";
             connection.query(sql, function(error, result) {
                 if (error) {
                     return connection.rollback(function() {
@@ -378,7 +378,42 @@ getData.prototype.set_quatation_detail = function(quat_date, quat_cust_id, quat_
                 var quat_id = result.insertId;
                 for (var i = 0; i < quat_products.length; i++) {
                     var prod_id = quat_products[i].prod_id;
-                    var sql1 = "INSERT INTO quatation_products VALUES (null,'" + prod_id + "','" + quat_id + "')";
+                    var prod_rate = quat_products[i].prod_rate;
+                    var sql1 = "INSERT INTO quatation_products VALUES (null,'" + prod_id + "','" + prod_rate + "','" + quat_id + "')";
+                    connection.query(sql1, function(error, rows) {
+                        if (error) {
+                            return connection.rollback(function() {
+                                callback(error);
+                            })
+                        } else {
+                            connection.commit()
+                            callback(rows);
+                        }
+                    })
+                }
+            })
+        }
+    })
+}
+
+getData.prototype.update_quatation_detail = function(quat_id, quat_date, cust_name, cust_address, cust_cont_person, cust_cont_no, quat_products, connection, callback) {
+
+    connection.beginTransaction(function(error) {
+        if (error) {
+            callback(error);
+        } else {
+            var sql = "UPDATE quatations SET quat_date='" + quat_date + "', quat_cust_name='" + cust_name + "', quat_cust_address='" + cust_address + "', quat_cont_person='" + cust_cont_person + "', quat_cont_no='" + cust_cont_no + "' WHERE quat_id= '" + quat_id + "'";
+            connection.query(sql, function(error, result) {
+                if (error) {
+                    return connection.rollback(function() {
+                        callback(error);
+                    })
+                }
+                for (var i = 0; i < quat_products.length; i++) {
+                    var quat_prod_id = quat_products[i].quat_prod_id;
+                    var prod_id = quat_products[i].prod_id;
+                    var prod_rate = quat_products[i].prod_rate;
+                    var sql1 = "UPDATE quatation_products SET prod_id='" + prod_id + "', quat_prod_rate='" + prod_rate + "', quat_id'" + quat_id + "' WHERE quat_prod_id='" + quat_prod_id + "'";
                     connection.query(sql1, function(error, rows) {
                         if (error) {
                             return connection.rollback(function() {
@@ -449,6 +484,7 @@ getData.prototype.set_purchase_detail = function(pur_date, pur_total_amount, pur
             callback(error);
         } else {
             var sql = "INSERT INTO purchases VALUES (null,'" + pur_date + "','" + pur_total_amount + "','" + pur_vend_id + "')";
+            console.log("Purchase " + sql);
             connection.query(sql, function(error, result) {
                 if (error) {
                     return connection.rollback(function() {
@@ -457,16 +493,19 @@ getData.prototype.set_purchase_detail = function(pur_date, pur_total_amount, pur
                 }
                 var pur_id = result.insertId;
                 for (var i = 0; i < pur_products.length; i++) {
-                    var prod_id = pur_products[i].pur_prod_id;
+                    var prod_id = pur_products[i].prod_id;
                     var prod_rate = pur_products[i].pur_prod_rate;
                     var prod_qty = pur_products[i].pur_prod_qty;
+                    var prod_subtotal = pur_products[i].pur_prod_subtotal;
+                    var prod_tax = pur_products[i].pur_prod_tax;
                     var prod_total = pur_products[i].pur_prod_total;
-                    var chal_no = pur_products[i].pur_chal_id;
+                    var chal_no = pur_products[i].pur_chal_no;
                     var chal_date = pur_products[i].pur_chal_date;
                     var veh_no = pur_products[i].pur_veh_no;
                     var prod_hsn = pur_products[i].pur_prod_hsn;
 
-                    var sql1 = "INSERT INTO purchase_products VALUES (null,'" + prod_id + "','" + prod_rate + "','" + prod_qty + "','" + pur_id + "','" + prod_total + "','" + chal_no + "','" + chal_date + "','" + veh_no + "','" + prod_hsn + "')";
+                    var sql1 = "INSERT INTO purchase_products VALUES (null,'" + prod_id + "','" + prod_rate + "','" + prod_qty + "','" + pur_id + "','" + prod_subtotal + "','" + prod_tax + "','" + prod_total + "','" + chal_no + "','" + chal_date + "','" + veh_no + "','" + prod_hsn + "')";
+                    console.log("Purchase " + sql1);
                     connection.query(sql1, function(error, rows) {
                         if (error) {
                             return connection.rollback(function() {
@@ -497,7 +536,7 @@ getData.prototype.Ws_get_purchase_products = function(connection, callback) {
 
 getData.prototype.Ws_get_purchase_products_by_id = function(pur_id, connection, callback) {
 
-    var sql = "SELECT products.prod_name AS pur_prod_name, products.prod_unit AS pur_prod_unit, purchase_products.pur_prod_rate, purchase_products.pur_prod_qty, purchase_products.pur_chal_no, purchase_products.pur_chal_date, purchase_products.pur_veh_no, purchase_products.pur_prod_hsn, purchase_products.pur_prod_total FROM products, purchase_products WHERE products.prod_id = purchase_products.prod_id && pur_id = '" + pur_id + "'";
+    var sql = "SELECT products.prod_name AS pur_prod_name, products.prod_unit AS pur_prod_unit, purchase_products.pur_prod_rate, purchase_products.pur_prod_qty, purchase_products.pur_chal_no, purchase_products.pur_chal_date, purchase_products.pur_veh_no, purchase_products.pur_prod_hsn, purchase_products.pur_prod_subtotal, purchase_products.pur_prod_tax, purchase_products.pur_prod_total FROM products, purchase_products WHERE products.prod_id = purchase_products.prod_id && pur_id = '" + pur_id + "'";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -509,7 +548,6 @@ getData.prototype.Ws_get_purchase_products_by_id = function(pur_id, connection, 
 
 // Get invoice
 getData.prototype.Ws_get_invoices = function(connection, callback) {
-
     var sql = "select invoices.inv_id, invoices.inv_date, invoices.inv_cust_id, customers.cust_name AS inv_customer, customers.cust_contact_person AS inv_contact_person, customers.cust_contact AS inv_contact, customers.cust_address AS inv_address, invoices.inv_total_amount, invoices.inv_without_tax from invoices, customers where invoices.inv_cust_id=customers.cust_id";
     connection.query(sql, function(error, rows) {
         if (error) {
@@ -521,7 +559,7 @@ getData.prototype.Ws_get_invoices = function(connection, callback) {
 }
 
 getData.prototype.get_invoice_by_id = function(inv_id, connection, callback) {
-    var sql = "select invoices.inv_id, invoices.inv_date, invoices.inv_total_amount, invoices.inv_without_tax, customers.cust_id AS inv_cust_id, customers.cust_name AS inv_customer, customers.cust_address AS inv_address, customers.cust_contact AS inv_contact, customers.cust_contact_person AS inv_contact_person from customers, invoices WHERE customers.cust_id=invoices.inv_cust_id && inv_id = '" + inv_id + "'";
+    var sql = "select invoices.inv_id, invoices.inv_date, invoices.inv_product_total, invoices.inv_total_tax, invoices.inv_total_amount, invoices.inv_round_off, invoices.inv_without_tax, customers.cust_id AS inv_cust_id, customers.cust_name AS inv_customer, customers.cust_address AS inv_address, customers.cust_contact AS inv_contact, customers.cust_contact_person AS inv_contact_person from customers, invoices WHERE customers.cust_id=invoices.inv_cust_id && inv_id = '" + inv_id + "'";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -531,15 +569,14 @@ getData.prototype.get_invoice_by_id = function(inv_id, connection, callback) {
     })
 }
 
-getData.prototype.Ws_set_invoice_detail = function(inv_date, inv_cust_id, inv_total, inv_without_tax, inv_products, connection, callback) {
-
+getData.prototype.Ws_set_invoice_detail = function(inv_date, inv_cust_id, product_total, total_tax, inv_total, round_off, inv_without_tax, inv_products, connection, callback) {
     connection.beginTransaction(function(error) {
         if (error) {
+            console.log("Invoice Error " + error);
             callback(error);
         } else {
 
-            var sql = "INSERT INTO invoices VALUES (null,'" + inv_date + "','" + inv_cust_id + "','" + inv_total + "','" + inv_without_tax + "')";
-            console.log("Invoice products1 " + sql);
+            var sql = "INSERT INTO invoices VALUES (null,'" + inv_date + "','" + inv_cust_id + "','" + product_total + "','" + total_tax + "','" + inv_total + "','" + round_off + "','" + inv_without_tax + "')";
             connection.query(sql, function(error, result) {
                 if (error) {
                     return connection.rollback(function() {
@@ -559,7 +596,6 @@ getData.prototype.Ws_set_invoice_detail = function(inv_date, inv_cust_id, inv_to
                     var prod_tax = inv_products[i].prod_tax;
 
                     var sql1 = "INSERT INTO invoice_products VALUES (null,'" + prod_id + "','" + prod_qty + "','" + inv_id + "','" + chal_id + "','" + chal_no + "','" + prod_total + "','" + prod_rate + "','" + prod_sub_total + "','" + prod_tax + "')";
-                    console.log("Invoice products2 " + sql1);
                     connection.query(sql1, function(error, rows) {
                         if (error) {
                             return connection.rollback(function() {
@@ -568,7 +604,6 @@ getData.prototype.Ws_set_invoice_detail = function(inv_date, inv_cust_id, inv_to
                         }
 
                         var sql2 = "UPDATE challans SET chal_is_invoice_created = '1' WHERE chal_id = '" + chal_id + "'";
-                        console.log("Invoice products3 " + sql2);
                         connection.query(sql2, function(error, rows) {
                             if (error) {
                                 return connection.rollback(function() {
@@ -588,7 +623,7 @@ getData.prototype.Ws_set_invoice_detail = function(inv_date, inv_cust_id, inv_to
 
 getData.prototype.get_invoice_products_by_id = function(inv_id, connection, callback) {
 
-    var sql = "SELECT invoice_products.chal_id, challans.chal_date, invoice_products.inv_prod_qty AS prod_qty, vehicles.veh_number, products.prod_name, products.prod_unit, invoice_products.inv_prod_rate AS prod_rate, gst.gst_hsn AS prod_hsn, gst.gst_percentage AS prod_percentage, invoice_products.inv_prod_subtotal AS prod_sub_total, invoice_products.inv_prod_tax AS prod_tax, invoice_products.prod_total_amount FROM gst, challans, vehicles, products, invoice_products WHERE invoice_products.chal_id = challans.chal_id && products.prod_id = invoice_products.prod_id && gst.gst_id = products.prod_gst_id && challans.chal_veh_id = vehicles.veh_id && inv_id = '" + inv_id + "'";
+    var sql = "SELECT invoice_products.chal_id, challans.chal_no, challans.chal_date, invoice_products.inv_prod_qty AS prod_qty, vehicles.veh_number, products.prod_name, products.prod_unit, invoice_products.inv_prod_rate AS prod_rate, gst.gst_hsn AS prod_hsn, gst.gst_percentage AS prod_percentage, invoice_products.inv_prod_subtotal AS prod_sub_total, invoice_products.inv_prod_tax AS prod_tax, invoice_products.prod_total_amount FROM gst, challans, vehicles, products, invoice_products WHERE invoice_products.chal_id = challans.chal_id && products.prod_id = invoice_products.prod_id && gst.gst_id = products.prod_gst_id && challans.chal_veh_id = vehicles.veh_id && inv_id = '" + inv_id + "'";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -621,8 +656,8 @@ getData.prototype.get_cheque_entry_by_id = function(cheque_entry_id, connection,
     })
 }
 
-getData.prototype.set_cheque_entry = function(cheque_date, cheque_number, cheque_amount, account_no, cheque_cust_id, connection, callback) {
-    var sql = "INSERT INTO cheque_entries VALUES (null,'" + cheque_date + "','" + cheque_number + "','" + cheque_amount + "','" + account_no + "','" + cheque_cust_id + "')";
+getData.prototype.set_cheque_entry = function(cheque_date, cheque_number, cheque_amount, account_no, clearence_date, cheque_cust_id, connection, callback) {
+    var sql = "INSERT INTO cheque_entries VALUES (null,'" + cheque_date + "','" + cheque_number + "','" + cheque_amount + "','" + account_no + "','" + clearence_date + "','" + cheque_cust_id + "')";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -632,8 +667,8 @@ getData.prototype.set_cheque_entry = function(cheque_date, cheque_number, cheque
     })
 }
 
-getData.prototype.update_cheque_entry = function(cheque_entry_id, cheque_date, cheque_number, cheque_amount, account_no, cheque_cust_id, connection, callback) {
-    var sql = "UPDATE cheque_entries SET cheque_date='" + cheque_date + "', cheque_number='" + cheque_number + "',cheque_amount='" + cheque_amount + "', account_no='" + account_no + "', cheque_cust_id='" + cheque_cust_id + "' WHERE cheque_entry_id = '" + cheque_entry_id + "'";
+getData.prototype.update_cheque_entry = function(cheque_entry_id, cheque_date, cheque_number, cheque_amount, account_no, clearence_date, cheque_cust_id, connection, callback) {
+    var sql = "UPDATE cheque_entries SET cheque_date='" + cheque_date + "', cheque_number='" + cheque_number + "',cheque_amount='" + cheque_amount + "', account_no='" + account_no + "', cheque_clearence_date='" + clearence_date + "', cheque_cust_id='" + cheque_cust_id + "' WHERE cheque_entry_id = '" + cheque_entry_id + "'";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -677,7 +712,7 @@ getData.prototype.set_employee_detail = function(emp_name, emp_age, emp_contact,
     })
 }
 
-getData.prototype.update_employee_detail = function(emp_id, emp_name, emp_age, emp_address, date_of_joining, emp_role, employment_type, connection, callback) {
+getData.prototype.update_employee_detail = function(emp_id, emp_name, emp_age, emp_contact, emp_address, date_of_joining, emp_adhar_no, emp_role, employment_type, connection, callback) {
     var sql = "UPDATE employees SET emp_name='" + emp_name + "', emp_age='" + emp_age + "', emp_contact='" + emp_contact + "', emp_address='" + emp_address + "', date_of_joining='" + date_of_joining + "', emp_adhar_no='" + emp_adhar_no + "', emp_role='" + emp_role + "', employment_type='" + employment_type + "' WHERE emp_id = '" + emp_id + "'";
     connection.query(sql, function(error, rows) {
         if (error) {
@@ -690,7 +725,6 @@ getData.prototype.update_employee_detail = function(emp_id, emp_name, emp_age, e
 
 getData.prototype.delete_employee_detail = function(emp_id, connection, callback) {
     var sql = "DELETE FROM employees WHERE emp_id = '" + emp_id + "'";
-
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -725,7 +759,7 @@ getData.prototype.get_diesel_entries = function(connection, callback) {
 }
 
 getData.prototype.get_diesel_entry_by_id = function(diesel_entry_id, connection, callback) {
-    var sql = "SELECT diesel_entries.diesel_entry_id, diesel_entries.diesel_filling_date, diesel_entries.diesel_qty, diesel_entries.diesel_amount, diesel_entries.emp_id, employees.emp_name FROM diesel_entries, employees WHERE diesel_entries.emp_id = employees.emp_id && diesel_entries.diesel_entry_id = '" + diesel_entry_id + "'";
+    var sql = "SELECT diesel_entries.diesel_entry_id, diesel_entries.diesel_filling_date, diesel_entries.diesel_qty, diesel_entries.diesel_amount, diesel_entries.emp_id, diesel_entries.veh_id, employees.emp_name, vehicles.veh_number FROM diesel_entries, employees, vehicles WHERE diesel_entries.emp_id = employees.emp_id && diesel_entries.veh_id = vehicles.veh_id && diesel_entries.diesel_entry_id = '" + diesel_entry_id + "'";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -735,8 +769,8 @@ getData.prototype.get_diesel_entry_by_id = function(diesel_entry_id, connection,
     })
 }
 
-getData.prototype.set_diesel_entry = function(diesel_filling_date, diesel_qty, diesel_amount, emp_id, connection, callback) {
-    var sql = "INSERT INTO diesel_entries VALUES (null,'" + diesel_filling_date + "','" + diesel_qty + "','" + diesel_amount + "','" + emp_id + "')";
+getData.prototype.set_diesel_entry = function(diesel_filling_date, diesel_qty, diesel_amount, emp_id, veh_id, connection, callback) {
+    var sql = "INSERT INTO diesel_entries VALUES (null,'" + diesel_filling_date + "','" + diesel_qty + "','" + diesel_amount + "','" + emp_id + "','" + veh_id + "')";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -746,8 +780,8 @@ getData.prototype.set_diesel_entry = function(diesel_filling_date, diesel_qty, d
     })
 }
 
-getData.prototype.update_diesel_entry = function(diesel_entry_id, diesel_filling_date, diesel_qty, diesel_amount, emp_id, connection, callback) {
-    var sql = "UPDATE diesel_entries SET diesel_filling_date='" + diesel_filling_date + "', diesel_qty='" + diesel_qty + "',diesel_amount='" + diesel_amount + "', emp_id='" + emp_id + "' WHERE diesel_entry_id = '" + diesel_entry_id + "'";
+getData.prototype.update_diesel_entry = function(diesel_entry_id, diesel_filling_date, diesel_qty, diesel_amount, emp_id, veh_id, connection, callback) {
+    var sql = "UPDATE diesel_entries SET diesel_filling_date='" + diesel_filling_date + "', diesel_qty='" + diesel_qty + "',diesel_amount='" + diesel_amount + "', emp_id='" + emp_id + "', veh_id='" + veh_id + "' WHERE diesel_entry_id = '" + diesel_entry_id + "'";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -815,7 +849,255 @@ getData.prototype.delete_payment_detail = function(payment_id, connection, callb
 }
 
 getData.prototype.get_payment_detail_by_id = function(payment_id, connection, callback) {
-    var sql = "SELECT payment_details.payment_id, payment_details.payment_date, payment_details.payment_amount, payment_details.payment_mode, payment_details.payment_type, payment_details.emp_id, employees.emp_name FROM payment_details, employees WHERE payment_id = '" + payment_id + "'";
+    var sql = "SELECT payment_details.payment_id, payment_details.payment_date, payment_details.payment_amount, payment_details.payment_mode, payment_details.payment_type, payment_details.emp_id, employees.emp_name FROM payment_details, employees WHERE payment_details.emp_id = employees.emp_id && payment_id = '" + payment_id + "'";
+    connection.query(sql, function(error, rows) {
+        if (error) {
+            callback(error);
+        } else {
+            callback(rows);
+        }
+    })
+}
+
+// Account transactions
+getData.prototype.get_account_details = function(connection, callback) {
+    var sql = "SELECT * FROM account_details";
+    connection.query(sql, function(error, rows) {
+        if (error) {
+            callback(error);
+        } else {
+            callback(rows);
+        }
+    })
+}
+
+getData.prototype.get_account_detail_by_id = function(account_id, connection, callback) {
+    var sql = "SELECT * FROM account_details WHERE account_id = '" + account_id + "'";
+    connection.query(sql, function(error, rows) {
+        if (error) {
+            callback(error);
+        } else {
+            callback(rows);
+        }
+    })
+}
+
+getData.prototype.set_account_detail = function(account_no, bank_name, bank_address, account_type, connection, callback) {
+    var sql = "INSERT INTO account_details VALUES (null,'" + account_no + "','" + bank_name + "','" + bank_address + "','" + account_type + "')";
+    connection.query(sql, function(error, rows) {
+        if (error) {
+            callback(error);
+        } else {
+            callback(rows);
+        }
+    })
+}
+
+getData.prototype.update_account_detail = function(account_id, account_no, bank_name, bank_address, account_type, connection, callback) {
+    var sql = "UPDATE account_details SET account_no='" + account_no + "', bank_name='" + bank_name + "', bank_address='" + bank_address + "', account_type='" + account_type + "' WHERE account_id = '" + account_id + "'";
+    connection.query(sql, function(error, rows) {
+        if (error) {
+            callback(error);
+        } else {
+            callback(rows);
+        }
+    })
+}
+
+getData.prototype.delete_account_detail = function(account_id, connection, callback) {
+    var sql = "DELETE FROM account_details WHERE account_id = '" + account_id + "'";
+
+    connection.query(sql, function(error, rows) {
+        if (error) {
+            callback(error);
+        } else {
+            callback(rows);
+        }
+    })
+}
+
+// EMI transactions
+getData.prototype.get_emi_details = function(connection, callback) {
+    var sql = "SELECT emi_details.emi_id, emi_details.emi_date, emi_details.vehicle_id, emi_details.emi_month_year, emi_details.emi_amount, emi_details.payment_mode, emi_details.cheque_date, emi_details.cheque_no, emi_details.cheque_bank, vehicles.veh_number FROM emi_details, vehicles WHERE emi_details.vehicle_id = vehicles.veh_id";
+    connection.query(sql, function(error, rows) {
+        if (error) {
+            callback(error);
+        } else {
+            callback(rows);
+        }
+    })
+}
+
+getData.prototype.get_emi_detail_by_id = function(emi_id, connection, callback) {
+    var sql = "SELECT emi_details.emi_id, emi_details.emi_date, emi_details.vehicle_id, emi_details.emi_month_year, emi_details.emi_amount, emi_details.payment_mode, emi_details.cheque_date, emi_details.cheque_no, emi_details.cheque_bank, vehicles.veh_number FROM emi_details, vehicles WHERE emi_details.vehicle_id = vehicles.veh_id && emi_details.emi_id = '" + emi_id + "'";
+    connection.query(sql, function(error, rows) {
+        if (error) {
+            callback(error);
+        } else {
+            callback(rows);
+        }
+    })
+}
+
+getData.prototype.set_emi_detail = function(emi_date, vehicle_id, emi_month_year, emi_amount, payment_mode, cheque_date, cheque_no, cheque_bank, connection, callback) {
+    var sql = "INSERT INTO emi_details VALUES (null,'" + emi_date + "','" + vehicle_id + "','" + emi_month_year + "','" + emi_amount + "','" + payment_mode + "','" + cheque_date + "','" + cheque_no + "','" + cheque_bank + "')";
+    console.log("EMI " + sql);
+    connection.query(sql, function(error, rows) {
+        if (error) {
+            callback(error);
+        } else {
+            callback(rows);
+        }
+    })
+}
+
+getData.prototype.update_emi_detail = function(emi_id, emi_date, vehicle_id, emi_month_year, emi_amount, payment_mode, cheque_date, cheque_no, cheque_bank, connection, callback) {
+    var sql = "UPDATE emi_details SET emi_date='" + emi_date + "', vehicle_id='" + vehicle_id + "', emi_month_year='" + emi_month_year + "', emi_amount='" + emi_amount + "', payment_mode='" + payment_mode + "', cheque_date='" + cheque_date + "', cheque_no='" + cheque_no + "', cheque_bank='" + cheque_bank + "' WHERE emi_id = '" + emi_id + "'";
+    connection.query(sql, function(error, rows) {
+        if (error) {
+            callback(error);
+        } else {
+            callback(rows);
+        }
+    })
+}
+
+getData.prototype.delete_emi_detail = function(emi_id, connection, callback) {
+    var sql = "DELETE FROM emi_details WHERE emi_id = '" + emi_id + "'";
+    connection.query(sql, function(error, rows) {
+        if (error) {
+            callback(error);
+        } else {
+            callback(rows);
+        }
+    })
+}
+
+// Card transactions
+getData.prototype.get_card_details = function(connection, callback) {
+    var sql = "SELECT card_details.card_id, card_details.card_date, card_details.rto_pune_amount, card_details.rto_pcmc_amount, card_details.police_shirval_amount, card_details.police_chakan_amount, card_details.police_other_amount, vehicles.veh_id, vehicles.veh_number FROM card_details, vehicles where card_details.vehicle_id = vehicles.veh_id";
+    connection.query(sql, function(error, rows) {
+        if (error) {
+            callback(error);
+        } else {
+            callback(rows);
+        }
+    })
+}
+
+getData.prototype.get_card_detail_by_id = function(card_id, connection, callback) {
+    var sql = "SELECT card_details.card_id, card_details.card_date, card_details.rto_pune_amount, card_details.rto_pcmc_amount, card_details.police_shirval_amount, card_details.police_chakan_amount, card_details.police_other_amount, vehicles.veh_id, vehicles.veh_number FROM card_details, vehicles WHERE card_details.vehicle_id = vehicles.veh_id && card_id = '" + card_id + "'";
+    connection.query(sql, function(error, rows) {
+        if (error) {
+            callback(error);
+        } else {
+            callback(rows);
+        }
+    })
+}
+
+getData.prototype.set_card_detail = function(card_date, vehicle_id, rto_pune_amount, rto_pcmc_amount, police_shirval_amount, police_chakan_amount, police_other_amount, connection, callback) {
+    var sql = "INSERT INTO card_details VALUES (null,'" + card_date + "','" + vehicle_id + "','" + rto_pune_amount + "','" + rto_pcmc_amount + "','" + police_shirval_amount + "','" + police_chakan_amount + "','" + police_other_amount + "')";
+    connection.query(sql, function(error, rows) {
+        if (error) {
+            callback(error);
+        } else {
+            callback(rows);
+        }
+    })
+}
+
+getData.prototype.update_card_detail = function(card_id, card_date, vehicle_id, rto_pune_amount, rto_pcmc_amount, police_shirval_amount, police_chakan_amount, police_other_amount, connection, callback) {
+    var sql = "UPDATE card_details SET card_date='" + card_date + "', vehicle_id='" + vehicle_id + "', rto_pune_amount='" + rto_pune_amount + "', rto_pcmc_amount='" + rto_pcmc_amount + "', police_shirval_amount='" + police_shirval_amount + "', police_chakan_amount='" + police_chakan_amount + "', police_other_amount='" + police_other_amount + "' WHERE card_id = '" + card_id + "'";
+    connection.query(sql, function(error, rows) {
+        if (error) {
+            callback(error);
+        } else {
+            callback(rows);
+        }
+    })
+}
+
+getData.prototype.delete_card_detail = function(card_id, connection, callback) {
+    var sql = "DELETE FROM card_details WHERE card_id = '" + card_id + "'";
+    connection.query(sql, function(error, rows) {
+        if (error) {
+            callback(error);
+        } else {
+            callback(rows);
+        }
+    })
+}
+
+// Trip transactions
+getData.prototype.get_trip_details = function(connection, callback) {
+    var sql = "SELECT trip_details.trip_id, trip_details.trip_date, trip_details.loading_place, trip_details.unloading_place, trip_details.material_qty, trip_details.driver_id, trip_details.driver_expenses_amount, trip_details.diesel_expenses_amount, trip_details.vehicle_id, vehicles.veh_number, employees.emp_name FROM trip_details, employees, vehicles WHERE trip_details.driver_id = employees.emp_id && trip_details.vehicle_id = vehicles.veh_id";
+    connection.query(sql, function(error, rows) {
+        if (error) {
+            callback(error);
+        } else {
+            callback(rows);
+        }
+    })
+}
+
+getData.prototype.get_trip_detail_by_id = function(trip_id, connection, callback) {
+    var sql = "SELECT trip_details.trip_id, trip_details.trip_date, trip_details.loading_place, trip_details.unloading_place, trip_details.material_qty, trip_details.driver_id, trip_details.driver_expenses_amount, trip_details.diesel_expenses_amount, trip_details.toll_charges, trip_details.worker_charges, trip_details.washing_charges, trip_details.maintenance_charges, employees.emp_name, trip_details.vehicle_id, vehicles.veh_number FROM trip_details, employees, vehicles WHERE trip_details.driver_id = employees.emp_id && trip_details.vehicle_id = vehicles.veh_id && trip_id = '" + trip_id + "'";
+    connection.query(sql, function(error, rows) {
+        if (error) {
+            callback(error);
+        } else {
+            callback(rows);
+        }
+    })
+}
+
+getData.prototype.set_trip_detail = function(trip_date, vehicle_id, loading_place, unloading_place, material_qty, driver_id, driver_expenses_amount, diesel_expenses_amount, toll_charges, worker_charges, washing_charges, maintenance_charges, connection, callback) {
+    var sql = "INSERT INTO trip_details VALUES (null,'" + trip_date + "','" + vehicle_id + "','" + loading_place + "','" + unloading_place + "','" + material_qty + "','" + driver_id + "','" + driver_expenses_amount + "','" + diesel_expenses_amount + "','" + toll_charges + "','" + worker_charges + "','" + washing_charges + "','" + maintenance_charges + "')";
+    connection.query(sql, function(error, rows) {
+        if (error) {
+            callback(error);
+        } else {
+            callback(rows);
+        }
+    })
+}
+
+getData.prototype.update_trip_detail = function(trip_id, trip_date, vehicle_id, loading_place, unloading_place, material_qty, driver_id, driver_expenses_amount, diesel_expenses_amount, toll_charges, worker_charges, washing_charges, maintenance_charges, connection, callback) {
+    var sql = "UPDATE trip_details SET trip_date='" + trip_date + "', vehicle_id='" + vehicle_id + "', loading_place='" + loading_place + "', unloading_place='" + unloading_place + "', material_qty='" + material_qty + "', driver_id='" + driver_id + "', driver_expenses_amount='" + driver_expenses_amount + "', diesel_expenses_amount='" + diesel_expenses_amount + "', toll_charges='" + toll_charges + "', worker_charges='" + worker_charges + "', washing_charges='" + washing_charges + "', maintenance_charges='" + maintenance_charges + "'WHERE trip_id = '" + trip_id + "'";
+    connection.query(sql, function(error, rows) {
+        if (error) {
+            callback(error);
+        } else {
+            callback(rows);
+        }
+    })
+}
+
+getData.prototype.delete_trip_detail = function(trip_id, connection, callback) {
+    var sql = "DELETE FROM trip_details WHERE trip_id = '" + trip_id + "'";
+    connection.query(sql, function(error, rows) {
+        if (error) {
+            callback(error);
+        } else {
+            callback(rows);
+        }
+    })
+}
+
+getData.prototype.get_invoice_total_with_tax = function(connection, callback) {
+    var sql = "SELECT SUM(prod_rate) AS total_amount FROM products";
+    connection.query(sql, function(error, rows) {
+        if (error) {
+            callback(error);
+        } else {
+            callback(rows);
+        }
+    })
+}
+
+getData.prototype.get_invoice_total_without_tax = function(connection, callback) {
+    var sql = "SELECT SUM(inv_total_amount) AS invoice_total FROM invoices WHERE inv_without_tax = '1'";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);

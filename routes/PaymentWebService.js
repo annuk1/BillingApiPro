@@ -14,14 +14,8 @@ exports.Ws_get_payment_details = function(request, response) {
 
     var objutil = require("./Utility.js");
 
-    var outPutData = "";
-    var success = objutil.Save;
     var failure = objutil.Failure;
-    var invalidData = objutil.invalidData;
-    var delete1 = objutil.delete1;
     var error = objutil.error;
-    var Update = objutil.Update;
-
 
     request.getConnection(function(err, connection) {
 
@@ -123,13 +117,9 @@ exports.Ws_set_payment_detail = function(request, response) {
 
     var objutil = require("./Utility.js");
 
-    var outPutData = "";
-    var success = objutil.Save;
     var failure = objutil.Failure;
     var invalidData = objutil.invalidData;
-    var delete1 = objutil.delete1;
     var error = objutil.error;
-    var Update = objutil.Update;
     if (request.body.data) {
         try {
             var reqJsonString = request.body.data;
@@ -178,40 +168,35 @@ exports.Ws_set_payment_detail = function(request, response) {
                         }
                     }
                 }
-            });
+            })
         }
     })
-};
-
+}
 
 //This web service is used to set customer details
 exports.Ws_update_payment_detail = function(request, response) {
 
     var objutil = require("./Utility.js");
-
-    var outPutData = "";
-    var success = objutil.Save;
     var failure = objutil.Failure;
     var invalidData = objutil.invalidData;
-    var delete1 = objutil.delete1;
     var error = objutil.error;
-    var Update = objutil.Update;
 
     if (request.body.data) {
         try {
             var reqJsonString = request.body.data;
-            var cheque_entry_id = reqJsonString.cheque_entry_id;
-            var cheque_date = reqJsonString.cheque_date;
-            var cheque_number = reqJsonString.cheque_number;
-            var cheque_amount = reqJsonString.cheque_amount;
-            var account_no = reqJsonString.account_no;
-            var cheque_cust_id = reqJsonString.cheque_cust_id;
-            if (cheque_entry_id == "" || cheque_entry_id == null || cheque_entry_id == undefined ||
-                cheque_date == "" || cheque_date == null || cheque_date == undefined ||
-                cheque_number == "" || cheque_number == null || cheque_number == undefined ||
-                cheque_amount == "" || cheque_amount == null || cheque_amount == undefined ||
-                account_no == "" || account_no == null || account_no == undefined ||
-                cheque_cust_id == "" || cheque_cust_id == null || cheque_cust_id == undefined) {
+            var payment_id = reqJsonString.payment_id;
+            var payment_date = reqJsonString.payment_date;
+            var emp_id = reqJsonString.emp_id;
+            var payment_amount = reqJsonString.payment_amount;
+            var payment_mode = reqJsonString.payment_mode;
+            var payment_type = reqJsonString.payment_type;
+
+            if (payment_id == "" || payment_id == null || payment_id == undefined ||
+                payment_date == "" || payment_date == null || payment_date == undefined ||
+                emp_id == "" || emp_id == null || emp_id == undefined ||
+                payment_amount == "" || payment_amount == null || payment_amount == undefined ||
+                payment_mode == "" || payment_mode == null || payment_mode == undefined ||
+                payment_type == "" || payment_type == null || payment_type == undefined) {
                 response.send(invalidData);
                 return;
             }
@@ -229,7 +214,7 @@ exports.Ws_update_payment_detail = function(request, response) {
             response.send(error);
             return;
         } else {
-            ObjectDB.update_payment_detail(cheque_entry_id, cheque_date, cheque_number, cheque_amount, account_no, cheque_cust_id, connection, function(callback) {
+            ObjectDB.update_payment_detail(payment_id, payment_date, emp_id, payment_amount, payment_mode, payment_type, connection, function(callback) {
                 if (callback) {
 
                     if (callback.affectedRows < 1) {
@@ -237,7 +222,7 @@ exports.Ws_update_payment_detail = function(request, response) {
                         return;
                     } else {
                         if (callback.affectedRows > 0) {
-                            Result = '{"status":200' + ',' + '"message" :"Cheque entry updated successfully."' + '}';
+                            Result = '{"status":200' + ',' + '"message" :"Payment detail updated successfully."' + '}';
                             response.send(Result);
                             return;
                         } else {

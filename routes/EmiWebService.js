@@ -2,44 +2,32 @@ var express = require("express");
 var app = express();
 var bodyParser = require("body-parser");
 var request = require('request');
-var dateformat = require('dateformat');
-app.use(bodyParser.json()); // Body parser use JSON data
-
-var http = require('http');
-
 var ObjDB = require("./DataAccess.js");
 var ObjectDB = new ObjDB();
 
-exports.Ws_get_cheque_entries = function(request, response) {
-
+exports.Ws_get_emi_details = function(request, response) {
     var objutil = require("./Utility.js");
 
-    var outPutData = "";
-    var success = objutil.Save;
     var failure = objutil.Failure;
-    var invalidData = objutil.invalidData;
-    var delete1 = objutil.delete1;
-    var error = objutil.error;
-    var Update = objutil.Update;
 
+    request.getConnection(function(error, connection) {
 
-    request.getConnection(function(err, connection) {
-
-        if (err) {
-            console.log("Error while connecting DB :" + err);
+        if (error) {
+            console.log("Error while connecting DB :" + error);
             response.send(error);
             return;
         } else {
-            ObjectDB.get_cheque_entries(connection, function(callback) {
+            ObjectDB.get_emi_details(connection, function(callback) {
                 if (callback) {
-                    var newsubstr = JSON.stringify(callback);
-
+                    data = callback;
+                    var Arr_Temp = data;
+                    var newsubstr = JSON.stringify(Arr_Temp);
                     if (newsubstr.indexOf("status") > -1 && newsubstr.indexOf("500") > -1 && newsubstr.indexOf("Internal server error") > -1) {
                         response.send(error);
                         return;
                     } else {
-                        if (newsubstr.length > 0) {
-                            Result = '{"chequeEntries" : ' + JSON.stringify(callback) + '}';
+                        if (data.length > 0) {
+                            Result = '{"emi_details" : ' + JSON.stringify(data) + '}';
                             Result = Result.substring(0, Result.length - 1);
                             Result = Result + ',' + '"status":200';
                             Result = Result + ',' + '"message" :"success"' + '}';
@@ -58,7 +46,7 @@ exports.Ws_get_cheque_entries = function(request, response) {
     })
 }
 
-exports.Ws_get_cheque_entry_by_id = function(request, response) {
+exports.Ws_get_emi_detail_by_id = function(request, response) {
     var objutil = require("./Utility.js");
 
     var outPutData = "";
@@ -72,35 +60,36 @@ exports.Ws_get_cheque_entry_by_id = function(request, response) {
     if (request.body.data) {
         try {
             var reqJsonString = request.body.data;
-            var cheque_entry_id = reqJsonString.cheque_entry_id;
-            if (cheque_entry_id == "" || cheque_entry_id == null || cheque_entry_id == undefined) {
+            var emi_id = reqJsonString.emi_id;
+            if (emi_id == "" || emi_id == null || emi_id == undefined) {
                 response.send(invalidData);
                 return;
             }
-        } catch (err) {
-            var errMessage = err.message;
+        } catch (error) {
+            var errMessage = error.message;
             console.log("Error in data :" + errMessage);
             response.send(error);
             return;
         }
     }
 
-    request.getConnection(function(err, connection) {
+    request.getConnection(function(error, connection) {
 
-        if (err) {
-            console.log("Error while connecting DB :" + err);
+        if (error) {
+            console.log("Error while connecting DB :" + error);
             response.send(error);
             return;
         } else {
-            ObjectDB.get_cheque_entry_by_id(cheque_entry_id, connection, function(callback) {
+            ObjectDB.get_emi_detail_by_id(emi_id, connection, function(callback) {
                 if (callback) {
-                    var newsubstr = JSON.stringify(callback);
+                    data = callback;
+                    var newsubstr = JSON.stringify(data);
                     if (newsubstr.indexOf("status") > -1 && newsubstr.indexOf("500") > -1 && newsubstr.indexOf("Internal server error") > -1) {
                         response.send(error);
                         return;
                     } else {
-                        if (callback.length > 0) {
-                            Result = '{"chequeEntries" : ' + JSON.stringify(callback) + '}';
+                        if (data.length > 0) {
+                            Result = '{"emi_details" : ' + JSON.stringify(data) + '}';
                             Result = Result.substring(0, Result.length - 1);
                             Result = Result + ',' + '"status":200';
                             Result = Result + ',' + '"message" :"success"' + '}';
@@ -118,60 +107,58 @@ exports.Ws_get_cheque_entry_by_id = function(request, response) {
     })
 }
 
-//This web service is used to set customer details
-exports.Ws_set_cheque_entry = function(request, response) {
+exports.Ws_set_emi_detail = function(request, response) {
 
     var objutil = require("./Utility.js");
 
-    var outPutData = "";
-    var success = objutil.Save;
     var failure = objutil.Failure;
     var invalidData = objutil.invalidData;
-    var delete1 = objutil.delete1;
-    var error = objutil.error;
-    var Update = objutil.Update;
 
     if (request.body.data) {
         try {
             var reqJsonString = request.body.data;
 
+            var emi_date = reqJsonString.emi_date;
+            var vehicle_id = reqJsonString.vehicle_id;
+            var emi_month_year = reqJsonString.emi_month_year;
+            var emi_amount = reqJsonString.emi_amount;
+            var payment_mode = reqJsonString.payment_mode;
             var cheque_date = reqJsonString.cheque_date;
-            var cheque_number = reqJsonString.cheque_number;
-            var cheque_amount = reqJsonString.cheque_amount;
-            var account_no = reqJsonString.account_no;
-            var clearence_date = reqJsonString.cheque_clearence_date;
-            var cheque_cust_id = reqJsonString.cheque_cust_id;
+            var cheque_no = reqJsonString.cheque_no;
+            var cheque_bank = reqJsonString.cheque_bank;
 
-            if (cheque_date == "" || cheque_date == null || cheque_date == undefined ||
-                cheque_number == "" || cheque_number == null || cheque_number == undefined ||
-                cheque_amount == "" || cheque_amount == null || cheque_amount == undefined ||
-                account_no == "" || account_no == null || account_no == undefined ||
-                cheque_cust_id == "" || cheque_cust_id == null || cheque_cust_id == undefined) {
+            if (emi_date == "" || emi_date == null || emi_date == undefined ||
+                vehicle_id == "" || vehicle_id == null || vehicle_id == undefined ||
+                emi_amount == "" || emi_amount == null || emi_amount == undefined ||
+                emi_month_year == "" || emi_month_year == null || emi_month_year == undefined ||
+                payment_mode == "" || payment_mode == null || payment_mode == undefined) {
                 response.send(invalidData);
                 return;
             }
-        } catch (err) {
-            var errMessage = err.message;
+        } catch (error) {
+            var errMessage = error.message;
             console.log("Error in data :" + errMessage);
             response.send(error);
             return;
         }
     }
 
-    request.getConnection(function(err, connection) {
+    request.getConnection(function(error, connection) {
 
-        if (err) {
+        if (error) {
             response.send(error);
             return;
         } else {
-            ObjectDB.set_cheque_entry(cheque_date, cheque_number, cheque_amount, account_no, clearence_date, cheque_cust_id, connection, function(callback) {
+            ObjectDB.set_emi_detail(emi_date, vehicle_id, emi_month_year, emi_amount, payment_mode, cheque_date, cheque_no, cheque_bank, connection, function(callback) {
                 if (callback) {
+
                     if (callback.affectedRows < 1) {
                         response.send(error);
                         return;
                     } else {
+
                         if (callback.insertId > 0) {
-                            Result = '{"status":200' + ',' + '"message" :"Cheque entry added successfully."' + '}';
+                            Result = '{"status":200' + ',' + '"message" :"EMI detail added successfully."' + '}';
                             response.send(Result);
                             return;
                         } else {
@@ -187,60 +174,56 @@ exports.Ws_set_cheque_entry = function(request, response) {
 };
 
 
-//This web service is used to set customer details
-exports.Ws_update_cheque_entry = function(request, response) {
+exports.Ws_update_emi_detail = function(request, response) {
 
     var objutil = require("./Utility.js");
-
-    var outPutData = "";
-    var success = objutil.Save;
     var failure = objutil.Failure;
     var invalidData = objutil.invalidData;
-    var delete1 = objutil.delete1;
-    var error = objutil.error;
-    var Update = objutil.Update;
 
     if (request.body.data) {
         try {
             var reqJsonString = request.body.data;
-            var cheque_entry_id = reqJsonString.cheque_entry_id;
+            var emi_id = reqJsonString.emi_id;
+            var emi_date = reqJsonString.emi_date;
+            var vehicle_id = reqJsonString.vehicle_id;
+            var emi_month_year = reqJsonString.emi_month_year;
+            var emi_amount = reqJsonString.emi_amount;
+            var payment_mode = reqJsonString.payment_mode;
             var cheque_date = reqJsonString.cheque_date;
-            var cheque_number = reqJsonString.cheque_number;
-            var cheque_amount = reqJsonString.cheque_amount;
-            var account_no = reqJsonString.account_no;
-            var cheque_cust_id = reqJsonString.cheque_cust_id;
-            if (cheque_entry_id == "" || cheque_entry_id == null || cheque_entry_id == undefined ||
-                cheque_date == "" || cheque_date == null || cheque_date == undefined ||
-                cheque_number == "" || cheque_number == null || cheque_number == undefined ||
-                cheque_amount == "" || cheque_amount == null || cheque_amount == undefined ||
-                account_no == "" || account_no == null || account_no == undefined ||
-                cheque_cust_id == "" || cheque_cust_id == null || cheque_cust_id == undefined) {
+            var cheque_no = reqJsonString.cheque_no;
+            var cheque_bank = reqJsonString.cheque_bank;
+
+            if (emi_id == "" || emi_id == null || emi_id == undefined ||
+                emi_date == "" || emi_date == null || emi_date == undefined ||
+                vehicle_id == "" || vehicle_id == null || vehicle_id == undefined ||
+                emi_amount == "" || emi_amount == null || emi_amount == undefined ||
+                emi_month_year == "" || emi_month_year == null || emi_month_year == undefined ||
+                payment_mode == "" || payment_mode == null || payment_mode == undefined) {
                 response.send(invalidData);
                 return;
             }
-        } catch (err) {
-            var errMessage = err.message;
+        } catch (error) {
+            var errMessage = error.message;
             console.log("Error in data :" + errMessage);
             response.send(error);
             return;
         }
     }
 
-    request.getConnection(function(err, connection) {
+    request.getConnection(function(error, connection) {
 
-        if (err) {
+        if (error) {
             response.send(error);
             return;
         } else {
-            ObjectDB.update_cheque_entry(cheque_entry_id, cheque_date, cheque_number, cheque_amount, account_no, cheque_cust_id, connection, function(callback) {
+            ObjectDB.update_emi_detail(emi_id, emi_date, vehicle_id, emi_month_year, emi_amount, payment_mode, cheque_date, cheque_no, cheque_bank, connection, function(callback) {
                 if (callback) {
-
                     if (callback.affectedRows < 1) {
                         response.send(error);
                         return;
                     } else {
                         if (callback.affectedRows > 0) {
-                            Result = '{"status":200' + ',' + '"message" :"Cheque entry updated successfully."' + '}';
+                            Result = '{"status":200' + ',' + '"message" :"EMI detail updated successfully."' + '}';
                             response.send(Result);
                             return;
                         } else {
@@ -256,49 +239,43 @@ exports.Ws_update_cheque_entry = function(request, response) {
 };
 
 
-exports.Ws_delete_cheque_entry = function(request, response) {
+exports.Ws_delete_emi_detail = function(request, response) {
 
     var objutil = require("./Utility.js");
-
-    var outPutData = "";
-    var success = objutil.Save;
     var failure = objutil.Failure;
     var invalidData = objutil.invalidData;
-    var delete1 = objutil.delete1;
-    var error = objutil.error;
-    var Update = objutil.Update;
 
     if (request.body.data) {
         try {
             var reqJsonString = request.body.data;
-            var cheque_entry_id = reqJsonString.cheque_entry_id;
-            if (cheque_entry_id == "" || cheque_entry_id == null || cheque_entry_id == undefined) {
+
+            var emi_id = reqJsonString.emi_id;
+            if (emi_id == "" || emi_id == null || emi_id == undefined) {
                 response.send(invalidData);
                 return;
             }
-        } catch (err) {
-            var errMessage = err.message;
+        } catch (error) {
+            var errMessage = error.message;
             console.log("Error in data :" + errMessage);
             response.send(error);
             return;
         }
     }
 
-    request.getConnection(function(err, connection) {
-
-        if (err) {
+    request.getConnection(function(error, connection) {
+        if (error) {
             response.send(error);
             return;
         } else {
-            ObjectDB.delete_cheque_entry(cheque_entry_id, connection, function(callback) {
+            ObjectDB.delete_emi_detail(emi_id, connection, function(callback) {
                 if (callback) {
                     if (callback.code === 'ER_ROW_IS_REFERENCED_2') {
-                        deleteError = '{"status":501' + ',' + '"message" :"Cannot delete cheque entry as it is used in Invoicing."' + '}';
+                        deleteError = '{"status":501' + ',' + '"message" :"Cannot delete emi details as it is used in Invoicing."' + '}';
                         response.send(deleteError);
                         return;
                     } else {
                         if (callback.affectedRows > 0) {
-                            Result = '{"status":200' + ',' + '"message" :"Cheque entry deleted successfully."' + '}';
+                            Result = '{"status":200' + ',' + '"message" :"EMI detail deleted successfully."' + '}';
                             response.send(Result);
                             return;
                         } else {

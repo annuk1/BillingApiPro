@@ -130,7 +130,6 @@ exports.Ws_set_employee = function(request, response) {
     var delete1 = objutil.delete1;
     var error = objutil.error;
     var Update = objutil.Update;
-    console.log("Add Employee data ", +request);
     if (request.body.data) {
         try {
             var reqJsonString = request.body.data;
@@ -197,18 +196,14 @@ exports.Ws_update_employee = function(request, response) {
 
     var objutil = require("./Utility.js");
 
-    var outPutData = "";
-    var success = objutil.Save;
     var failure = objutil.Failure;
     var invalidData = objutil.invalidData;
-    var delete1 = objutil.delete1;
     var error = objutil.error;
-    var Update = objutil.Update;
 
     if (request.body.data) {
         try {
             var reqJsonString = request.body.data;
-            console.log("Update Employee ", +JSON.stringify(reqJsonString));
+            var emp_id = reqJsonString.emp_id;
             var emp_name = reqJsonString.emp_name;
             var emp_age = reqJsonString.emp_age;
             var emp_contact = reqJsonString.emp_contact;
@@ -217,7 +212,8 @@ exports.Ws_update_employee = function(request, response) {
             var emp_adhar_no = reqJsonString.emp_adhar_no;
             var emp_role = reqJsonString.emp_role;
             var employment_type = reqJsonString.employment_type;
-            if (emp_name == "" || emp_name == null || emp_name == undefined ||
+            if (emp_id == "" || emp_id == null || emp_id == undefined ||
+                emp_name == "" || emp_name == null || emp_name == undefined ||
                 emp_age == "" || emp_age == null || emp_age == undefined ||
                 emp_contact == "" || emp_contact == null || emp_contact == undefined ||
                 emp_address == "" || emp_address == null || emp_address == undefined ||

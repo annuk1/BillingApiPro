@@ -77,17 +77,17 @@ exports.Ws_get_challan_by_id = function(request, response) {
                 response.send(invalidData);
                 return;
             }
-        } catch (err) {
-            var errMessage = err.message;
+        } catch (error) {
+            var errMessage = error.message;
             response.send(error);
             return;
         }
     }
 
-    request.getConnection(function(err, connection) {
+    request.getConnection(function(error, connection) {
 
-        if (err) {
-            console.log("Error while connecting DB :" + err);
+        if (error) {
+            console.log("Error while connecting DB :" + error);
             response.send(error);
             return;
         } else {
@@ -119,7 +119,7 @@ exports.Ws_get_challan_by_id = function(request, response) {
     })
 };
 
-//This web service is use to set customer details .
+//This web service is use to set challan details
 exports.Ws_set_challan = function(request, response) {
 
     var objutil = require("./Utility.js");
@@ -183,10 +183,78 @@ exports.Ws_set_challan = function(request, response) {
                         }
                     }
                 }
-            });
+            })
         }
     })
-};
+}
+
+//This web service is use to set challan details
+exports.Ws_update_challan = function(request, response) {
+
+    var objutil = require("./Utility.js");
+
+    var outPutData = "";
+    var success = objutil.Save;
+    var failure = objutil.Failure;
+    var invalidData = objutil.invalidData;
+    var delete1 = objutil.delete1;
+    var error = objutil.error;
+    var Update = objutil.Update;
+
+    if (request.body.data) {
+        try {
+            var reqJsonString = request.body.data;
+            var chal_id = reqJsonString.chal_id;
+            var chal_date = reqJsonString.chal_date;
+            var chal_no = reqJsonString.chal_no;
+            var cust_id = reqJsonString.chal_cust_id;
+            var prod_id = reqJsonString.chal_prod_id;
+            var veh_id = reqJsonString.chal_veh_id;
+            var chal_qty = reqJsonString.chal_quantity;
+            if (chal_id == "" || chal_id == null || chal_id == undefined ||
+                chal_date == "" || chal_date == null || chal_date == undefined ||
+                chal_no == "" || chal_no == null || chal_no == undefined ||
+                cust_id == "" || cust_id == null || cust_id == undefined ||
+                prod_id == "" || prod_id == null || prod_id == undefined ||
+                veh_id == "" || veh_id == null || veh_id == undefined ||
+                chal_qty == "" || chal_qty == null || chal_qty == undefined) {
+                response.send(invalidData);
+                return;
+            }
+        } catch (error) {
+            var errMessage = error.message;
+            console.log("Error in data :" + errMessage);
+            response.send(error);
+            return;
+        }
+    }
+
+    request.getConnection(function(error, connection) {
+        if (error) {
+            response.send(error);
+            return;
+        } else {
+            ObjectDB.update_challan_detail(chal_id, chal_no, chal_date, chal_qty, cust_id, prod_id, veh_id, connection, function(callback) {
+                if (callback) {
+                    if (callback.affectedRows < 1) {
+                        response.send(error);
+                        return;
+                    } else {
+                        if (callback.affectedRows > 0) {
+                            Result = '{"status":200' + ',' + '"message" :"Challan updated successfully."' + '}';
+                            response.send(Result);
+                            return;
+                        } else {
+                            Result = failure;
+                            response.send(Result);
+                            return;
+                        }
+                    }
+                }
+            })
+        }
+    })
+}
 
 exports.Ws_get_challans_by_customer_id = function(request, response) {
 

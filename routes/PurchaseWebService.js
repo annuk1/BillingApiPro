@@ -133,22 +133,18 @@ exports.Ws_set_purchase = function(request, response) {
 
     var objutil = require("./Utility.js");
 
-    var outPutData = "";
-    var success = objutil.Save;
     var failure = objutil.Failure;
     var invalidData = objutil.invalidData;
-    var delete1 = objutil.delete1;
     var error = objutil.error;
-    var Update = objutil.Update;
 
     if (request.body.data) {
         try {
             var reqJsonString = request.body.data;
-            console.log("Input " + JSON.stringify(reqJsonString));
             var pur_date = reqJsonString.pur_date;
             var pur_total_amount = reqJsonString.pur_total_amount;
             var pur_vend_id = reqJsonString.pur_vendor_id;
             var pur_products = reqJsonString.pur_products;
+            console.log("Set Purchase" + JSON.stringify(reqJsonString));
 
             if (pur_date == "" || pur_date == null || pur_date == undefined ||
                 pur_total_amount == "" || pur_total_amount == null || pur_total_amount == undefined ||

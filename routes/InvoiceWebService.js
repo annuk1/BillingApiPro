@@ -15,14 +15,8 @@ exports.Ws_get_invoices = function(request, response) {
 
     var objutil = require("./Utility.js");
 
-    var outPutData = "";
-    var success = objutil.Save;
     var failure = objutil.Failure;
-    var invalidData = objutil.invalidData;
-    var delete1 = objutil.delete1;
     var error = objutil.error;
-    var Update = objutil.Update;
-
 
     request.getConnection(function(err, connection) {
 
@@ -63,13 +57,9 @@ exports.Ws_get_invoice_by_id = function(request, response) {
 
     var objutil = require("./Utility.js");
 
-    var outPutData = "";
-    var success = objutil.Save;
     var failure = objutil.Failure;
     var invalidData = objutil.invalidData;
-    var delete1 = objutil.delete1;
     var error = objutil.error;
-    var Update = objutil.Update;
 
     if (request.body.data) {
         try {
@@ -124,39 +114,37 @@ exports.Ws_get_invoice_by_id = function(request, response) {
     })
 }
 
-//This web service is use to set customer details .
+//This web service is use to set invoice details
 exports.Ws_set_invoice = function(request, response) {
 
     var objutil = require("./Utility.js");
 
-    var outPutData = "";
-    var success = objutil.Save;
     var failure = objutil.Failure;
     var invalidData = objutil.invalidData;
-    var delete1 = objutil.delete1;
     var error = objutil.error;
-    var Update = objutil.Update;
-
-    var reqJsonString;
 
     if (request.body.data) {
         try {
             var reqJsonString = request.body.data;
             var inv_date = reqJsonString.inv_date;
             var cust_id = reqJsonString.inv_cust_id;
+            var product_total = reqJsonString.inv_product_total;
+            var total_tax = reqJsonString.inv_total_tax;
             var inv_total = reqJsonString.inv_total_amount;
+            var round_off = reqJsonString.inv_round_off;
             var inv_without_tax = reqJsonString.inv_without_tax;
             var inv_products = reqJsonString.inv_products;
 
             if (inv_date == "" || inv_date == null || inv_date == undefined ||
                 cust_id == "" || cust_id == null || cust_id == undefined ||
-                inv_total == "" || inv_total == null || inv_total == undefined ||
+                inv_total == 0 || inv_total == undefined ||
+                product_total == 0 || product_total == undefined ||
                 inv_products == null || inv_products == undefined) {
                 response.send(invalidData);
                 return;
             }
-        } catch (err) {
-            var errMessage = err.message;
+        } catch (error) {
+            var errMessage = error.message;
             console.log("Error in data :" + errMessage);
             response.send(error);
             return;
@@ -168,13 +156,13 @@ exports.Ws_set_invoice = function(request, response) {
             response.send(error);
             return;
         } else {
-            ObjectDB.Ws_set_invoice_detail(inv_date, cust_id, inv_total, inv_without_tax, inv_products, connection, function(callback) {
+            ObjectDB.Ws_set_invoice_detail(inv_date, cust_id, product_total, total_tax, inv_total, round_off, inv_without_tax, inv_products, connection, function(callback) {
                 if (callback) {
                     if (callback.affectedRows < 1) {
                         response.send(error);
                         return;
                     } else {
-                        if (callback.insertId > 0) {
+                        if (callback.affectedRows > 0) {
                             Result = '{"status":200' + ',' + '"message" :"Invoice added successfully."' + '}';
                             response.send(Result);
                             return;
@@ -227,8 +215,7 @@ exports.Ws_get_invoice_products_by_id = function(request, response) {
             ObjectDB.get_invoice_products_by_id(inv_id, connection, function(callback) {
                 if (callback) {
                     data = callback;
-                    var Arr_Temp = data;
-                    var newsubstr = JSON.stringify(Arr_Temp);
+                    var newsubstr = JSON.stringify(data);
 
                     if (newsubstr.indexOf("status") > -1 && newsubstr.indexOf("500") > -1 && newsubstr.indexOf("Internal server error") > -1) {
                         response.send(error);

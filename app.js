@@ -26,8 +26,6 @@ var dbhostname = "",
     databasename = "";
 
 if (process.env.VCAP_SERVICES) {
-
-
     var svcInfo = JSON.parse(process.env.VCAP_SERVICES);
     for (var label in svcInfo) {
         var svcs = svcInfo[label];
@@ -75,6 +73,11 @@ var Wscall_Cheque = require('./routes/ChequeWebService.js');
 var Wscall_Employee = require('./routes/EmployeeWebService.js');
 var Wscall_Diesel = require('./routes/DieselEntryWebService.js');
 var Wscall_Payment = require('./routes/PaymentWebService.js');
+var Wscall_Account = require('./routes/AccountWebService.js');
+var Wscall_Card = require('./routes/CardWebService.js');
+var Wscall_Emi = require('./routes/EmiWebService.js');
+var Wscall_Trip = require('./routes/TripWebService.js');
+var Wscall_Dashboard = require('./routes/DashboardWebService.js');
 
 // Customer web services
 app.post('/getCustomers', Wscall_Customer.Ws_get_customers);
@@ -100,12 +103,14 @@ app.post('/deleteProduct', Wscall_Product.Ws_delete_product);
 // Challan web services
 app.post('/getChallans', Wscall_Challan.Ws_get_challans);
 app.post('/addChallan', Wscall_Challan.Ws_set_challan);
+app.post('/updateChallan', Wscall_Challan.Ws_update_challan);
 app.post('/getChallansByCustomerId', Wscall_Challan.Ws_get_challans_by_customer_id);
 app.post('/getChallanById', Wscall_Challan.Ws_get_challan_by_id);
 
 // Quatation web services
 app.post('/getQuatations', Wscall_Quatation.Ws_get_quatations);
 app.post('/addQuatation', Wscall_Quatation.Ws_set_quatation);
+app.post('/updateQuatation', Wscall_Quatation.Ws_update_quatation);
 app.post('/getQuatationProductsById', Wscall_Quatation.Ws_get_quatation_products_by_id);
 app.post('/getQuatationById', Wscall_Quatation.Ws_get_quatation_by_id);
 
@@ -163,6 +168,38 @@ app.post('/addPaymentDetail', Wscall_Payment.Ws_set_payment_detail);
 app.post('/updatePaymentDetail', Wscall_Payment.Ws_update_payment_detail);
 app.post('/deletePaymentDetail', Wscall_Payment.Ws_delete_payment_detail);
 
-var port = process.env.PORT || 3000;
+// Account Detail web services
+app.post('/getAccounts', Wscall_Account.Ws_get_account_details);
+app.post('/getAccountById', Wscall_Account.Ws_get_account_detail_by_id);
+app.post('/addAccount', Wscall_Account.Ws_set_account_detail);
+app.post('/updateAccount', Wscall_Account.Ws_update_account_detail);
+app.post('/deleteAccount', Wscall_Account.Ws_delete_account_detail);
+
+// Card Detail web services
+app.post('/getCardDetails', Wscall_Card.Ws_get_card_details);
+app.post('/getCardDetailById', Wscall_Card.Ws_get_card_detail_by_id);
+app.post('/addCardDetail', Wscall_Card.Ws_set_card_detail);
+app.post('/updateCardDetail', Wscall_Card.Ws_update_card_detail);
+app.post('/deleteCardDetail', Wscall_Card.Ws_delete_card_detail);
+
+// Emi Detail web services
+app.post('/getEmiDetails', Wscall_Emi.Ws_get_emi_details);
+app.post('/getEmiDetailById', Wscall_Emi.Ws_get_emi_detail_by_id);
+app.post('/addEmiDetail', Wscall_Emi.Ws_set_emi_detail);
+app.post('/updateEmiDetail', Wscall_Emi.Ws_update_emi_detail);
+app.post('/deleteEmiDetail', Wscall_Emi.Ws_delete_emi_detail);
+
+// Trip Detail web services
+app.post('/getTripDetails', Wscall_Trip.Ws_get_trip_details);
+app.post('/getTripDetailById', Wscall_Trip.Ws_get_trip_detail_by_id);
+app.post('/addTripDetail', Wscall_Trip.Ws_set_trip_detail);
+app.post('/updateTripDetail', Wscall_Trip.Ws_update_trip_detail);
+app.post('/deleteTripDetail', Wscall_Trip.Ws_delete_trip_detail);
+
+// Dashboard Detail web services
+app.post('/getInvoiceTotalWithTax', Wscall_Dashboard.Ws_get_invoice_total_with_tax);
+app.post('/getInvoiceTotalWithoutTax', Wscall_Dashboard.Ws_get_invoice_total_without_tax);
+
+var port = process.env.PORT || 5000;
 app.listen(port);
 console.log('Listening on port ..' + port);;
