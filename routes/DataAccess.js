@@ -894,7 +894,7 @@ getData.prototype.set_account_detail = function(account_no, bank_name, bank_addr
 }
 
 getData.prototype.update_account_detail = function(account_id, account_no, bank_name, bank_address, account_type, connection, callback) {
-    var sql = "UPDATE account_details SET account_no='" + account_no + "', bank_name='" + bank_name + "', bank_address='" + bank_address + "', account_type='" + account_type + "' WHERE account_id = '" + account_id + "'";
+    var sql = "UPDATE account_details SET account_number='" + account_no + "', bank_name='" + bank_name + "', bank_address='" + bank_address + "', account_type='" + account_type + "' WHERE account_id = '" + account_id + "'";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);

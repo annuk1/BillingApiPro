@@ -176,13 +176,8 @@ exports.Ws_set_account_detail = function(request, response) {
 exports.Ws_update_account_detail = function(request, response) {
 
     var objutil = require("./Utility.js");
-    var outPutData = "";
-    var success = objutil.Save;
     var failure = objutil.Failure;
     var invalidData = objutil.invalidData;
-    var delete1 = objutil.delete1;
-    var error = objutil.error;
-    var Update = objutil.Update;
 
     if (request.body.data) {
         try {
