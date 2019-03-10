@@ -26,17 +26,16 @@ exports.Ws_get_invoice_total_with_tax = function(request, response) {
             ObjectDB.get_invoice_total_with_tax(connection, function(callback) {
                 if (callback) {
                     data = callback;
-                    var newsubstr = JSON.stringify(data);
+                    var newsubstr = data;
                     if (newsubstr.indexOf("status") > -1 && newsubstr.indexOf("500") > -1 && newsubstr.indexOf("Internal server error") > -1) {
                         response.send(error);
                         return;
                     } else {
                         if (data.length > 0) {
-                            Result = '{"invoice_total" : ' + JSON.stringify(data[0].total_amount) + '}';
+                            Result = '{' + data + '}';
                             Result = Result.substring(0, Result.length - 1);
                             Result = Result + ',' + '"status":200';
                             Result = Result + ',' + '"message" :"success"' + '}';
-
                             response.send(Result);
                             return;
                         } else {
@@ -78,7 +77,7 @@ exports.Ws_get_invoice_total_without_tax = function(request, response) {
                         return;
                     } else {
                         if (data.length > 0) {
-                            Result = '{"invoice_total" : ' + JSON.stringify(data[0].total_amount) + '}';
+                            Result = '{"current_month_total" : ' + JSON.stringify(data[0].total_amount) + '}';
                             Result = Result.substring(0, Result.length - 1);
                             Result = Result + ',' + '"status":200';
                             Result = Result + ',' + '"message" :"success"' + '}';

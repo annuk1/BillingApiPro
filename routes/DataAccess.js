@@ -941,7 +941,6 @@ getData.prototype.get_emi_detail_by_id = function(emi_id, connection, callback) 
 
 getData.prototype.set_emi_detail = function(emi_date, vehicle_id, emi_month_year, emi_amount, payment_mode, cheque_date, cheque_no, cheque_bank, connection, callback) {
     var sql = "INSERT INTO emi_details VALUES (null,'" + emi_date + "','" + vehicle_id + "','" + emi_month_year + "','" + emi_amount + "','" + payment_mode + "','" + cheque_date + "','" + cheque_no + "','" + cheque_bank + "')";
-    console.log("EMI " + sql);
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -1086,18 +1085,52 @@ getData.prototype.delete_trip_detail = function(trip_id, connection, callback) {
 }
 
 getData.prototype.get_invoice_total_with_tax = function(connection, callback) {
-    var sql = "SELECT SUM(prod_rate) AS total_amount FROM products";
-    connection.query(sql, function(error, rows) {
+    connection.beginTransaction(function(error) {
         if (error) {
             callback(error);
         } else {
-            callback(rows);
+
+            var sql = "SELECT SUM(inv_total_amount) AS invoice_total FROM invoices WHERE inv_without_tax = '0'";
+
+            connection.query(sql, function(error, result) {
+                if (error) {
+                    return connection.rollback(function() {
+                        callback(error);
+                    })
+                }
+
+                var sql1 = "SELECT SUM(inv_total_amount) AS current_month_total FROM invoices WHERE MONTH(inv_date) = 2 AND inv_without_tax = '0'";
+                connection.query(sql1, function(error, result1) {
+                    if (error) {
+                        return connection.rollback(function() {
+                            callback(error);
+                        })
+                    }
+
+                    var sql2 = "SELECT SUM(inv_total_amount) AS todays_total FROM invoices WHERE inv_date = '2019-02-14' AND inv_without_tax = '0'";
+                    connection.query(sql2, function(error, result2) {
+                        if (error) {
+                            return connection.rollback(function() {
+                                callback(error);
+                            })
+                        } else {
+                            connection.commit()
+                            var invoice_total = JSON.stringify(result[0]).substring(1, JSON.stringify(result[0]).length - 1);
+                            var current_month = JSON.stringify(result1[0]).substring(1, JSON.stringify(result1[0]).length - 1);
+                            var todays_total = JSON.stringify(result2[0]).substring(1, JSON.stringify(result2[0]).length - 1);
+                            var finalResult = invoice_total + "," + current_month + "," + todays_total;
+
+                            callback(finalResult);
+                        }
+                    })
+                })
+            })
         }
     })
 }
 
 getData.prototype.get_invoice_total_without_tax = function(connection, callback) {
-    var sql = "SELECT SUM(inv_total_amount) AS invoice_total FROM invoices WHERE inv_without_tax = '1'";
+    var sql = "SELECT SUM(inv_total_amount) AS current_month_total FROM invoices WHERE inv_without_tax = '1'";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
