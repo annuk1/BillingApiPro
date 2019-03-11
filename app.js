@@ -198,7 +198,9 @@ app.post('/deleteTripDetail', Wscall_Trip.Ws_delete_trip_detail);
 
 // Dashboard Detail web services
 app.post('/getInvoiceTotalWithTax', Wscall_Dashboard.Ws_get_invoice_total_with_tax);
+app.post('/getPurchaseTotalWithTax', Wscall_Dashboard.Ws_get_purchase_total_with_tax);
 app.post('/getInvoiceTotalWithoutTax', Wscall_Dashboard.Ws_get_invoice_total_without_tax);
+app.post('/getPurchaseTotalWithoutTax', Wscall_Dashboard.Ws_get_purchase_total_without_tax);
 
 var port = process.env.PORT || 5000;
 app.listen(port);
