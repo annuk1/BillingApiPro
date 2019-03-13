@@ -1100,7 +1100,6 @@ getData.prototype.get_invoice_total_with_tax = function(current_date, connection
                 }
 
                 var sql1 = "SELECT SUM(inv_total_amount) AS current_month_total FROM invoices WHERE MONTH(inv_date) = MONTH('" + current_date + "') AND inv_without_tax = '0'";
-                console.log("Tax SQL 1 " + sql1);
                 connection.query(sql1, function(error, result1) {
                     if (error) {
                         return connection.rollback(function() {
@@ -1109,7 +1108,6 @@ getData.prototype.get_invoice_total_with_tax = function(current_date, connection
                     }
 
                     var sql2 = "SELECT SUM(inv_total_amount) AS todays_total FROM invoices WHERE inv_date = '" + current_date + "' AND inv_without_tax = '0'";
-                    console.log("Tax SQL 2 " + sql2);
                     connection.query(sql2, function(error, result2) {
                         if (error) {
                             return connection.rollback(function() {
@@ -1117,11 +1115,25 @@ getData.prototype.get_invoice_total_with_tax = function(current_date, connection
                             })
                         } else {
                             connection.commit()
-                            var invoice_total = JSON.stringify(result[0]).substring(1, JSON.stringify(result[0]).length - 1);
-                            var current_month = JSON.stringify(result1[0]).substring(1, JSON.stringify(result1[0]).length - 1);
-                            var todays_total = JSON.stringify(result2[0]).substring(1, JSON.stringify(result2[0]).length - 1);
-                            var finalResult = invoice_total + "," + current_month + "," + todays_total;
+                            var invoice_total = '{"invoice_total": 0 }';
+                            if (result[0].invoice_total != null) {
+                                invoice_total = JSON.stringify(result[0]);
+                            }
+                            invoice_total = invoice_total.substring(1, invoice_total.length - 1);
 
+                            var current_month_total = '{ "current_month_total": 0 }';
+                            if (result1[0].current_month_total != null) {
+                                current_month_total = JSON.stringify(result1[0]);
+                            }
+                            current_month_total = current_month_total.substring(1, current_month_total.length - 1);
+
+                            var todays_total = '{ "todays_total": 0 }';
+                            if (result2[0].todays_total != null) {
+                                todays_total = JSON.stringify(result2[0]);
+                            }
+                            todays_total = todays_total.substring(1, todays_total.length - 1);
+
+                            var finalResult = invoice_total + "," + current_month_total + "," + todays_total;
                             callback(finalResult);
                         }
                     })
@@ -1147,7 +1159,6 @@ getData.prototype.get_invoice_total_without_tax = function(current_date, connect
                 }
 
                 var sql1 = "SELECT SUM(inv_total_amount) AS current_month_total FROM invoices WHERE MONTH(inv_date) = MONTH('" + current_date + "') AND inv_without_tax = '1'";
-                console.log("SQL 1 " + sql1);
                 connection.query(sql1, function(error, result1) {
                     if (error) {
                         return connection.rollback(function() {
@@ -1164,11 +1175,25 @@ getData.prototype.get_invoice_total_without_tax = function(current_date, connect
                             })
                         } else {
                             connection.commit()
-                            var invoice_total = JSON.stringify(result[0]).substring(1, JSON.stringify(result[0]).length - 1);
-                            var current_month = JSON.stringify(result1[0]).substring(1, JSON.stringify(result1[0]).length - 1);
-                            var todays_total = JSON.stringify(result2[0]).substring(1, JSON.stringify(result2[0]).length - 1);
-                            console.log("SQL 2 " + sql2);
-                            var finalResult = invoice_total + "," + current_month + "," + todays_total;
+                            var invoice_total = '{"invoice_total": 0 }';
+                            if (result[0].invoice_total != null) {
+                                invoice_total = JSON.stringify(result[0]);
+                            }
+                            invoice_total = invoice_total.substring(1, invoice_total.length - 1);
+
+                            var current_month_total = '{ "current_month_total": 0 }';
+                            if (result1[0].current_month_total != null) {
+                                current_month_total = JSON.stringify(result1[0]);
+                            }
+                            current_month_total = current_month_total.substring(1, current_month_total.length - 1);
+
+                            var todays_total = '{ "todays_total": 0 }';
+                            if (result2[0].todays_total != null) {
+                                todays_total = JSON.stringify(result2[0]);
+                            }
+                            todays_total = todays_total.substring(1, todays_total.length - 1);
+
+                            var finalResult = invoice_total + "," + current_month_total + "," + todays_total;
 
                             callback(finalResult);
                         }
@@ -1195,7 +1220,6 @@ getData.prototype.get_purchase_total_with_tax = function(current_date, connectio
                 }
 
                 var sql1 = "SELECT SUM(pur_total_amount) AS current_month_total FROM purchases WHERE MONTH(pur_date) = MONTH('" + current_date + "')";
-                console.log("Tax SQL 1 " + sql1);
                 connection.query(sql1, function(error, result1) {
                     if (error) {
                         return connection.rollback(function() {
@@ -1204,7 +1228,6 @@ getData.prototype.get_purchase_total_with_tax = function(current_date, connectio
                     }
 
                     var sql2 = "SELECT SUM(pur_total_amount) AS todays_total FROM purchases WHERE pur_date = '" + current_date + "'";
-                    console.log("Tax SQL 2 " + sql2);
                     connection.query(sql2, function(error, result2) {
                         if (error) {
                             return connection.rollback(function() {
@@ -1212,11 +1235,25 @@ getData.prototype.get_purchase_total_with_tax = function(current_date, connectio
                             })
                         } else {
                             connection.commit()
-                            var purchase_total = JSON.stringify(result[0]).substring(1, JSON.stringify(result[0]).length - 1);
-                            var current_month = JSON.stringify(result1[0]).substring(1, JSON.stringify(result1[0]).length - 1);
-                            var todays_total = JSON.stringify(result2[0]).substring(1, JSON.stringify(result2[0]).length - 1);
-                            var finalResult = purchase_total + "," + current_month + "," + todays_total;
+                            var purchase_total = '{"purchase_total": 0 }';
+                            if (result[0].purchase_total != null) {
+                                purchase_total = JSON.stringify(result[0]);
+                            }
+                            purchase_total = purchase_total.substring(1, purchase_total.length - 1);
 
+                            var current_month_total = '{ "current_month_total": 0 }';
+                            if (result1[0].current_month_total != null) {
+                                current_month_total = JSON.stringify(result1[0]);
+                            }
+                            current_month_total = current_month_total.substring(1, current_month_total.length - 1);
+
+                            var todays_total = '{ "todays_total": 0 }';
+                            if (result2[0].todays_total != null) {
+                                todays_total = JSON.stringify(result2[0]);
+                            }
+                            todays_total = todays_total.substring(1, todays_total.length - 1);
+
+                            var finalResult = purchase_total + "," + current_month_total + "," + todays_total;
                             callback(finalResult);
                         }
                     })
@@ -1242,7 +1279,6 @@ getData.prototype.get_purchase_total_without_tax = function(current_date, connec
                 }
 
                 var sql1 = "SELECT SUM(pur_total_amount) AS current_month_total FROM purchases WHERE MONTH(pur_date) = MONTH(" + current_date + ") AND pur_without_tax = '1'";
-                console.log("SQL 1 " + sql1);
                 connection.query(sql1, function(error, result1) {
                     if (error) {
                         return connection.rollback(function() {
@@ -1251,7 +1287,6 @@ getData.prototype.get_purchase_total_without_tax = function(current_date, connec
                     }
 
                     var sql2 = "SELECT SUM(pur_total_amount) AS todays_total FROM purchases WHERE pur_date = " + current_date + " AND pur_without_tax = '1'";
-                    console.log("SQL 2 " + sql2);
                     connection.query(sql2, function(error, result2) {
                         if (error) {
                             return connection.rollback(function() {
@@ -1259,16 +1294,42 @@ getData.prototype.get_purchase_total_without_tax = function(current_date, connec
                             })
                         } else {
                             connection.commit()
-                            var purchase_total = JSON.stringify(result[0]).substring(1, JSON.stringify(result[0]).length - 1);
-                            var current_month = JSON.stringify(result1[0]).substring(1, JSON.stringify(result1[0]).length - 1);
-                            var todays_total = JSON.stringify(result2[0]).substring(1, JSON.stringify(result2[0]).length - 1);
-                            var finalResult = purchase_total + "," + current_month + "," + todays_total;
+                            var purchase_total = '{"purchase_total": 0 }';
+                            if (result[0].purchase_total != null) {
+                                purchase_total = JSON.stringify(result[0]);
+                            }
+                            purchase_total = purchase_total.substring(1, purchase_total.length - 1);
 
+                            var current_month_total = '{ "current_month_total": 0 }';
+                            if (result1[0].current_month_total != null) {
+                                current_month_total = JSON.stringify(result1[0]);
+                            }
+                            current_month_total = current_month_total.substring(1, current_month_total.length - 1);
+
+                            var todays_total = '{ "todays_total": 0 }';
+                            if (result2[0].todays_total != null) {
+                                todays_total = JSON.stringify(result2[0]);
+                            }
+                            todays_total = todays_total.substring(1, todays_total.length - 1);
+
+                            var finalResult = purchase_total + "," + current_month_total + "," + todays_total;
                             callback(finalResult);
                         }
                     })
                 })
             })
+        }
+    })
+}
+
+// Get invoice
+getData.prototype.get_selected_month_invoices = function(month, connection, callback) {
+    var sql = "SELECT invoices.inv_id, invoices.inv_date, customers.cust_name AS inv_customer, customers.cust_contact_person AS inv_contact_person, customers.cust_contact AS inv_contact, customers.cust_address AS inv_address, invoices.inv_product_total, invoices.inv_total_tax, invoices.inv_total_amount, invoices.inv_without_tax from invoices, customers where invoices.inv_cust_id=customers.cust_id AND MONTH(inv_date)= '" + month + "'";
+    connection.query(sql, function(error, rows) {
+        if (error) {
+            callback(error);
+        } else {
+            callback(rows);
         }
     })
 }
