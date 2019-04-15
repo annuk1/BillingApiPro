@@ -286,7 +286,7 @@ getData.prototype.get_gst_detail_by_id = function(gst_id, connection, callback) 
 
 
 getData.prototype.get_challans = function(connection, callback) {
-    var sql = "SELECT challans.chal_id, challans.chal_no, challans.chal_quantity, customers.cust_name AS chal_cust_name, customers.cust_address AS chal_cust_address, products.prod_name AS chal_prod_name, products.prod_unit AS chal_prod_unit, vehicles.veh_number AS chal_veh_no FROM challans, customers, products, vehicles WHERE challans.chal_cust_id=customers.cust_id && challans.chal_prod_id=products.prod_id && challans.chal_veh_id=vehicles.veh_id && challans.chal_is_invoice_created='0'";
+    var sql = "SELECT challans.chal_id, challans.chal_no, challans.chal_quantity, customers.cust_name AS chal_cust_name, customers.cust_address AS chal_cust_address, products.prod_name AS chal_prod_name, products.prod_unit AS chal_prod_unit, vehicles.veh_number AS chal_veh_no FROM challans, customers, products, vehicles WHERE challans.chal_cust_id=customers.cust_id && challans.chal_prod_id=products.prod_id && challans.chal_veh_id=vehicles.veh_id";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -484,7 +484,6 @@ getData.prototype.set_purchase_detail = function(pur_date, pur_total_amount, pur
             callback(error);
         } else {
             var sql = "INSERT INTO purchases VALUES (null,'" + pur_date + "','" + pur_total_amount + "','" + pur_vend_id + "')";
-            console.log("Purchase " + sql);
             connection.query(sql, function(error, result) {
                 if (error) {
                     return connection.rollback(function() {
@@ -505,7 +504,6 @@ getData.prototype.set_purchase_detail = function(pur_date, pur_total_amount, pur
                     var prod_hsn = pur_products[i].pur_prod_hsn;
 
                     var sql1 = "INSERT INTO purchase_products VALUES (null,'" + prod_id + "','" + prod_rate + "','" + prod_qty + "','" + pur_id + "','" + prod_subtotal + "','" + prod_tax + "','" + prod_total + "','" + chal_no + "','" + chal_date + "','" + veh_no + "','" + prod_hsn + "')";
-                    console.log("Purchase " + sql1);
                     connection.query(sql1, function(error, rows) {
                         if (error) {
                             return connection.rollback(function() {
@@ -572,7 +570,6 @@ getData.prototype.get_invoice_by_id = function(inv_id, connection, callback) {
 getData.prototype.Ws_set_invoice_detail = function(inv_date, inv_cust_id, product_total, total_tax, inv_total, round_off, inv_without_tax, inv_products, connection, callback) {
     connection.beginTransaction(function(error) {
         if (error) {
-            console.log("Invoice Error " + error);
             callback(error);
         } else {
 
@@ -748,7 +745,7 @@ getData.prototype.get_employee_by_id = function(emp_id, connection, callback) {
 // Diesel Transactions
 getData.prototype.get_diesel_entries = function(connection, callback) {
 
-    var sql = "SELECT diesel_entries.diesel_entry_id, diesel_entries.diesel_filling_date, diesel_entries.diesel_qty, diesel_entries.diesel_amount, diesel_entries.emp_id, employees.emp_name FROM diesel_entries, employees WHERE diesel_entries.emp_id = employees.emp_id";
+    var sql = "SELECT diesel_entries.diesel_entry_id, diesel_entries.diesel_filling_date, diesel_entries.diesel_qty, diesel_entries.diesel_amount, diesel_entries.pump_address, diesel_entries.emp_id, employees.emp_name FROM diesel_entries, employees WHERE diesel_entries.emp_id = employees.emp_id";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -759,7 +756,7 @@ getData.prototype.get_diesel_entries = function(connection, callback) {
 }
 
 getData.prototype.get_diesel_entry_by_id = function(diesel_entry_id, connection, callback) {
-    var sql = "SELECT diesel_entries.diesel_entry_id, diesel_entries.diesel_filling_date, diesel_entries.diesel_qty, diesel_entries.diesel_amount, diesel_entries.emp_id, diesel_entries.veh_id, employees.emp_name, vehicles.veh_number FROM diesel_entries, employees, vehicles WHERE diesel_entries.emp_id = employees.emp_id && diesel_entries.veh_id = vehicles.veh_id && diesel_entries.diesel_entry_id = '" + diesel_entry_id + "'";
+    var sql = "SELECT diesel_entries.diesel_entry_id, diesel_entries.diesel_filling_date, diesel_entries.diesel_qty, diesel_entries.diesel_amount, diesel_entries.emp_id, diesel_entries.veh_id, diesel_entries.pump_address, employees.emp_name, vehicles.veh_number FROM diesel_entries, employees, vehicles WHERE diesel_entries.emp_id = employees.emp_id && diesel_entries.veh_id = vehicles.veh_id && diesel_entries.diesel_entry_id = '" + diesel_entry_id + "'";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -769,8 +766,8 @@ getData.prototype.get_diesel_entry_by_id = function(diesel_entry_id, connection,
     })
 }
 
-getData.prototype.set_diesel_entry = function(diesel_filling_date, diesel_qty, diesel_amount, emp_id, veh_id, connection, callback) {
-    var sql = "INSERT INTO diesel_entries VALUES (null,'" + diesel_filling_date + "','" + diesel_qty + "','" + diesel_amount + "','" + emp_id + "','" + veh_id + "')";
+getData.prototype.set_diesel_entry = function(diesel_filling_date, diesel_qty, diesel_amount, emp_id, veh_id, pump_address, connection, callback) {
+    var sql = "INSERT INTO diesel_entries VALUES (null,'" + diesel_filling_date + "','" + diesel_qty + "','" + diesel_amount + "','" + emp_id + "','" + veh_id + "','" + pump_address + "')";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -780,8 +777,8 @@ getData.prototype.set_diesel_entry = function(diesel_filling_date, diesel_qty, d
     })
 }
 
-getData.prototype.update_diesel_entry = function(diesel_entry_id, diesel_filling_date, diesel_qty, diesel_amount, emp_id, veh_id, connection, callback) {
-    var sql = "UPDATE diesel_entries SET diesel_filling_date='" + diesel_filling_date + "', diesel_qty='" + diesel_qty + "',diesel_amount='" + diesel_amount + "', emp_id='" + emp_id + "', veh_id='" + veh_id + "' WHERE diesel_entry_id = '" + diesel_entry_id + "'";
+getData.prototype.update_diesel_entry = function(diesel_entry_id, diesel_filling_date, diesel_qty, diesel_amount, emp_id, veh_id, pump_address, connection, callback) {
+    var sql = "UPDATE diesel_entries SET diesel_filling_date='" + diesel_filling_date + "', diesel_qty='" + diesel_qty + "',diesel_amount='" + diesel_amount + "', emp_id='" + emp_id + "', veh_id='" + veh_id + "', pump_address='" + pump_address + "' WHERE diesel_entry_id = '" + diesel_entry_id + "'";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -804,7 +801,7 @@ getData.prototype.delete_diesel_entry = function(diesel_entry_id, connection, ca
 
 // Payment transactions
 getData.prototype.get_payment_details = function(connection, callback) {
-    var sql = "SELECT payment_details.payment_id, payment_details.payment_date, payment_details.payment_amount, payment_details.payment_mode, payment_details.payment_type, payment_details.emp_id, employees.emp_name FROM payment_details, employees WHERE payment_details.emp_id = employees.emp_id";
+    var sql = "SELECT payment_details.payment_id, payment_details.payment_date, payment_details.payee_type, payment_details.payee_id, payment_details.payee_name, payment_details.payment_amount, payment_details.payment_mode, payment_details.payment_acc_id, payment_details.payment_desc, account_details.account_number, account_details.bank_name, account_details.bank_address FROM payment_details, account_details WHERE payment_details.payment_acc_id = account_details.account_id";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -814,8 +811,8 @@ getData.prototype.get_payment_details = function(connection, callback) {
     })
 }
 
-getData.prototype.set_payment_detail = function(payment_date, emp_id, payment_amount, payment_mode, payment_type, connection, callback) {
-    var sql = "INSERT INTO payment_details VALUES (null,'" + payment_date + "','" + emp_id + "','" + payment_amount + "','" + payment_mode + "','" + payment_type + "')";
+getData.prototype.set_payment_detail = function(payment_date, payee_type, payee_id, payee_name, payment_amount, payment_mode, payment_account_id, payment_desc, connection, callback) {
+    var sql = "INSERT INTO payment_details VALUES (null,'" + payment_date + "','" + payee_type + "','" + payee_id + "','" + payee_name + "','" + payment_amount + "','" + payment_mode + "','" + payment_account_id + "','" + payment_desc + "')";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -825,8 +822,8 @@ getData.prototype.set_payment_detail = function(payment_date, emp_id, payment_am
     })
 }
 
-getData.prototype.update_payment_detail = function(payment_id, payment_date, emp_id, payment_amount, payment_mode, payment_type, connection, callback) {
-    var sql = "UPDATE payment_details SET payment_date='" + payment_date + "', emp_id='" + emp_id + "', payment_amount='" + payment_amount + "', payment_mode='" + payment_mode + "', payment_type='" + payment_type + "' WHERE payment_id = '" + payment_id + "'";
+getData.prototype.update_payment_detail = function(payment_id, payment_date, payee_type, payee_id, payee_name, payment_amount, payment_mode, payment_account_id, payment_desc, connection, callback) {
+    var sql = "UPDATE payment_details SET payment_date='" + payment_date + "', payee_type='" + payee_type + "', payee_id='" + payee_id + "', payee_name='" + payee_name + "', payment_amount='" + payment_amount + "', payment_mode='" + payment_mode + "', payment_acc_id='" + payment_account_id + "', payment_desc='" + payment_desc + "' WHERE payment_id = '" + payment_id + "'";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -849,7 +846,7 @@ getData.prototype.delete_payment_detail = function(payment_id, connection, callb
 }
 
 getData.prototype.get_payment_detail_by_id = function(payment_id, connection, callback) {
-    var sql = "SELECT payment_details.payment_id, payment_details.payment_date, payment_details.payment_amount, payment_details.payment_mode, payment_details.payment_type, payment_details.emp_id, employees.emp_name FROM payment_details, employees WHERE payment_details.emp_id = employees.emp_id && payment_id = '" + payment_id + "'";
+    var sql = "SELECT payment_details.payment_id, payment_details.payment_date, payment_details.payee_type, payment_details.payee_id, payment_details.payee_name, payment_details.payment_amount, payment_details.payment_mode, payment_details.payment_acc_id, payment_details.payment_desc, account_details.account_number, account_details.bank_name, account_details.bank_address FROM payment_details, account_details WHERE payment_details.payment_acc_id = account_details.account_id && payment_id = '" + payment_id + "'";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);

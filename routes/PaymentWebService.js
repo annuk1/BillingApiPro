@@ -124,16 +124,21 @@ exports.Ws_set_payment_detail = function(request, response) {
         try {
             var reqJsonString = request.body.data;
             var payment_date = reqJsonString.payment_date;
-            var emp_id = reqJsonString.emp_id;
+            var payee_type = reqJsonString.payee_type;
+            var payee_id = reqJsonString.payee_id;
+            var payee_name = reqJsonString.payee_name;
             var payment_amount = reqJsonString.payment_amount;
             var payment_mode = reqJsonString.payment_mode;
-            var payment_type = reqJsonString.payment_type;
+            var payment_account_id = reqJsonString.payment_acc_id;
+            var payment_desc = reqJsonString.payment_desc;
 
             if (payment_date == "" || payment_date == null || payment_date == undefined ||
-                emp_id == "" || emp_id == null || emp_id == undefined ||
+                payee_type == "" || payee_type == null || payee_type == undefined ||
+                payee_id == "" || payee_id == null || payee_id == undefined ||
+                payee_name == "" || payee_name == null || payee_name == undefined ||
                 payment_amount == "" || payment_amount == null || payment_amount == undefined ||
                 payment_mode == "" || payment_mode == null || payment_mode == undefined ||
-                payment_type == "" || payment_type == null || payment_type == undefined) {
+                payment_account_id == "" || payment_account_id == null || payment_account_id == undefined) {
                 response.send(invalidData);
                 return;
             }
@@ -151,7 +156,7 @@ exports.Ws_set_payment_detail = function(request, response) {
             response.send(error);
             return;
         } else {
-            ObjectDB.set_payment_detail(payment_date, emp_id, payment_amount, payment_mode, payment_type, connection, function(callback) {
+            ObjectDB.set_payment_detail(payment_date, payee_type, payee_id, payee_name, payment_amount, payment_mode, payment_account_id, payment_desc, connection, function(callback) {
                 if (callback) {
                     if (callback.affectedRows < 1) {
                         response.send(error);
@@ -173,7 +178,7 @@ exports.Ws_set_payment_detail = function(request, response) {
     })
 }
 
-//This web service is used to set customer details
+//This web service is used to set payment details
 exports.Ws_update_payment_detail = function(request, response) {
 
     var objutil = require("./Utility.js");
@@ -186,17 +191,22 @@ exports.Ws_update_payment_detail = function(request, response) {
             var reqJsonString = request.body.data;
             var payment_id = reqJsonString.payment_id;
             var payment_date = reqJsonString.payment_date;
-            var emp_id = reqJsonString.emp_id;
+            var payee_type = reqJsonString.payee_type;
+            var payee_id = reqJsonString.payee_id;
+            var payee_name = reqJsonString.payee_name;
             var payment_amount = reqJsonString.payment_amount;
             var payment_mode = reqJsonString.payment_mode;
-            var payment_type = reqJsonString.payment_type;
+            var payment_account_id = reqJsonString.payment_acc_id;
+            var payment_desc = reqJsonString.payment_desc;
 
             if (payment_id == "" || payment_id == null || payment_id == undefined ||
                 payment_date == "" || payment_date == null || payment_date == undefined ||
-                emp_id == "" || emp_id == null || emp_id == undefined ||
+                payee_type == "" || payee_type == null || payee_type == undefined ||
+                payee_id == "" || payee_id == null || payee_id == undefined ||
+                payee_name == "" || payee_name == null || payee_name == undefined ||
                 payment_amount == "" || payment_amount == null || payment_amount == undefined ||
-                payment_mode == "" || payment_mode == null || payment_mode == undefined ||
-                payment_type == "" || payment_type == null || payment_type == undefined) {
+                payment_mode == "" || payment_mode == null || payment_mode == undefined) {
+
                 response.send(invalidData);
                 return;
             }
@@ -214,7 +224,7 @@ exports.Ws_update_payment_detail = function(request, response) {
             response.send(error);
             return;
         } else {
-            ObjectDB.update_payment_detail(payment_id, payment_date, emp_id, payment_amount, payment_mode, payment_type, connection, function(callback) {
+            ObjectDB.update_payment_detail(payment_id, payment_date, payee_type, payee_id, payee_name, payment_amount, payment_mode, payment_account_id, payment_desc, connection, function(callback) {
                 if (callback) {
 
                     if (callback.affectedRows < 1) {
