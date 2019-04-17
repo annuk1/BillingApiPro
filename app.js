@@ -77,6 +77,7 @@ var Wscall_Account = require('./routes/AccountWebService.js');
 var Wscall_Card = require('./routes/CardWebService.js');
 var Wscall_Emi = require('./routes/EmiWebService.js');
 var Wscall_Trip = require('./routes/TripWebService.js');
+var Wscall_Insurance = require('./routes/InsuranceWebService.js');
 var Wscall_Dashboard = require('./routes/DashboardWebService.js');
 
 // Customer web services
@@ -195,6 +196,13 @@ app.post('/getTripDetailById', Wscall_Trip.Ws_get_trip_detail_by_id);
 app.post('/addTripDetail', Wscall_Trip.Ws_set_trip_detail);
 app.post('/updateTripDetail', Wscall_Trip.Ws_update_trip_detail);
 app.post('/deleteTripDetail', Wscall_Trip.Ws_delete_trip_detail);
+
+// Trip Detail web services
+app.post('/getInsuranceDetails', Wscall_Insurance.Ws_get_insurance_details);
+app.post('/getInsuranceDetailById', Wscall_Insurance.Ws_get_insurance_detail_by_id);
+app.post('/addInsuranceDetail', Wscall_Insurance.Ws_set_insurance_detail);
+app.post('/updateInsuranceDetail', Wscall_Insurance.Ws_update_insurance_detail);
+app.post('/deleteInsuranceDetail', Wscall_Insurance.Ws_delete_insurance_detail);
 
 // Dashboard Detail web services
 app.post('/getInvoiceTotalWithTax', Wscall_Dashboard.Ws_get_invoice_total_with_tax);

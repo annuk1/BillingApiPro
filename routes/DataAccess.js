@@ -1331,4 +1331,61 @@ getData.prototype.get_selected_month_invoices = function(month, connection, call
     })
 }
 
+getData.prototype.get_insurance_details = function(connection, callback) {
+    var sql = "SELECT insurance_details.insurance_id, insurance_details.policy_no, insurance_details.policy_issued_date, insurance_details.vehicle_id, insurance_details.premium_amount, insurance_details.insurance_company, insurance_details.nominee_name, insurance_details.additional_comments, vehicles.veh_number as vehicle_no FROM insurance_details, vehicles WHERE insurance_details.vehicle_id = vehicles.veh_id";
+    connection.query(sql, function(error, rows) {
+        if (error) {
+            callback(error);
+        } else {
+            callback(rows);
+        }
+    })
+}
+
+getData.prototype.set_insurance_detail = function(policy_no, issued_date, vehicle_id, premium_amount, insurance_company, nominee_name, additional_comments, connection, callback) {
+    var sql = "INSERT INTO insurance_details VALUES (null,'" + policy_no + "','" + issued_date + "','" + vehicle_id + "','" + premium_amount + "','" + insurance_company + "','" + nominee_name + "','" + additional_comments + "')";
+    console.log("Update Insurance " + sql);
+    connection.query(sql, function(error, rows) {
+        if (error) {
+            callback(error);
+        } else {
+            callback(rows);
+        }
+    })
+}
+
+getData.prototype.update_insurance_detail = function(insurance_id, policy_no, issued_date, vehicle_id, premium_amount, insurance_company, nominee_name, additional_comments, connection, callback) {
+    var sql = "UPDATE insurance_details SET policy_no='" + policy_no + "', policy_issued_date='" + issued_date + "', vehicle_id='" + vehicle_id + "', premium_amount='" + premium_amount + "', insurance_company='" + insurance_company + "', nominee_name='" + nominee_name + "', additional_comments='" + additional_comments + "' WHERE insurance_id = '" + insurance_id + "'";
+    connection.query(sql, function(error, rows) {
+        if (error) {
+            callback(error);
+        } else {
+            callback(rows);
+        }
+    })
+}
+
+getData.prototype.delete_insurance_detail = function(insurance_id, connection, callback) {
+    var sql = "DELETE FROM insurance_details WHERE insurance_id = '" + insurance_id + "'";
+
+    connection.query(sql, function(error, rows) {
+        if (error) {
+            callback(error);
+        } else {
+            callback(rows);
+        }
+    })
+}
+
+getData.prototype.get_insurance_detail_by_id = function(insurance_id, connection, callback) {
+    var sql = "SELECT insurance_details.insurance_id, insurance_details.policy_no, insurance_details.policy_issued_date, insurance_details.vehicle_id, insurance_details.premium_amount, insurance_details.insurance_company, insurance_details.nominee_name, insurance_details.additional_comments, vehicles.veh_number as vehicle_no FROM insurance_details, vehicles WHERE insurance_details.vehicle_id = vehicles.veh_id && insurance_id = '" + insurance_id + "'";
+    connection.query(sql, function(error, rows) {
+        if (error) {
+            callback(error);
+        } else {
+            callback(rows);
+        }
+    })
+}
+
 exports = module.exports = getData;
