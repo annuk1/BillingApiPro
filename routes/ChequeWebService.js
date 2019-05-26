@@ -138,14 +138,15 @@ exports.Ws_set_cheque_entry = function(request, response) {
             var cheque_date = reqJsonString.cheque_date;
             var cheque_number = reqJsonString.cheque_number;
             var cheque_amount = reqJsonString.cheque_amount;
-            var account_no = reqJsonString.account_no;
+            var account_id = reqJsonString.account_id;
             var clearence_date = reqJsonString.cheque_clearence_date;
             var cheque_cust_id = reqJsonString.cheque_cust_id;
 
             if (cheque_date == "" || cheque_date == null || cheque_date == undefined ||
                 cheque_number == "" || cheque_number == null || cheque_number == undefined ||
                 cheque_amount == "" || cheque_amount == null || cheque_amount == undefined ||
-                account_no == "" || account_no == null || account_no == undefined ||
+                account_id == "" || account_id == null || account_id == undefined ||
+                clearence_date == "" || clearence_date == null || clearence_date == undefined ||
                 cheque_cust_id == "" || cheque_cust_id == null || cheque_cust_id == undefined) {
                 response.send(invalidData);
                 return;
@@ -164,7 +165,7 @@ exports.Ws_set_cheque_entry = function(request, response) {
             response.send(error);
             return;
         } else {
-            ObjectDB.set_cheque_entry(cheque_date, cheque_number, cheque_amount, account_no, clearence_date, cheque_cust_id, connection, function(callback) {
+            ObjectDB.set_cheque_entry(cheque_date, cheque_number, cheque_amount, account_id, clearence_date, cheque_cust_id, connection, function(callback) {
                 if (callback) {
                     if (callback.affectedRows < 1) {
                         response.send(error);
@@ -207,13 +208,15 @@ exports.Ws_update_cheque_entry = function(request, response) {
             var cheque_date = reqJsonString.cheque_date;
             var cheque_number = reqJsonString.cheque_number;
             var cheque_amount = reqJsonString.cheque_amount;
-            var account_no = reqJsonString.account_no;
+            var account_id = reqJsonString.account_id;
+            var clearence_date = reqJsonString.cheque_clearence_date;
             var cheque_cust_id = reqJsonString.cheque_cust_id;
             if (cheque_entry_id == "" || cheque_entry_id == null || cheque_entry_id == undefined ||
                 cheque_date == "" || cheque_date == null || cheque_date == undefined ||
                 cheque_number == "" || cheque_number == null || cheque_number == undefined ||
                 cheque_amount == "" || cheque_amount == null || cheque_amount == undefined ||
-                account_no == "" || account_no == null || account_no == undefined ||
+                account_id == "" || account_id == null || account_id == undefined ||
+                clearence_date == "" || clearence_date == null || clearence_date == undefined ||
                 cheque_cust_id == "" || cheque_cust_id == null || cheque_cust_id == undefined) {
                 response.send(invalidData);
                 return;
@@ -232,7 +235,7 @@ exports.Ws_update_cheque_entry = function(request, response) {
             response.send(error);
             return;
         } else {
-            ObjectDB.update_cheque_entry(cheque_entry_id, cheque_date, cheque_number, cheque_amount, account_no, cheque_cust_id, connection, function(callback) {
+            ObjectDB.update_cheque_entry(cheque_entry_id, cheque_date, cheque_number, cheque_amount, account_id, clearence_date, cheque_cust_id, connection, function(callback) {
                 if (callback) {
 
                     if (callback.affectedRows < 1) {

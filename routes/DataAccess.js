@@ -309,6 +309,7 @@ getData.prototype.get_challan_by_id = function(challanId, connection, callback) 
 
 getData.prototype.set_challan_detail = function(chal_no, chal_date, chal_qty, cust_id, prod_id, veh_id, is_invoice_created, connection, callback) {
     var sql = "INSERT INTO challans VALUES (null,'" + chal_no + "','" + chal_date + "','" + chal_qty + "','" + cust_id + "','" + prod_id + "','" + veh_id + "','" + is_invoice_created + "')";
+    console.log("Add Challan " + sql);
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -319,7 +320,7 @@ getData.prototype.set_challan_detail = function(chal_no, chal_date, chal_qty, cu
 }
 
 getData.prototype.get_challans_by_customer_id = function(customerId, connection, callback) {
-    var sql = "SELECT challans.chal_id, challans.chal_no, challans.chal_date, challans.chal_prod_id, challans.chal_veh_id, challans.chal_quantity, vehicles.veh_number, products.prod_name, products.prod_unit, products.prod_rate, gst.gst_hsn, gst.gst_percentage FROM challans, vehicles, products, gst WHERE challans.chal_veh_id = vehicles.veh_id && challans.chal_prod_id = products.prod_id && products.prod_gst_id = gst.gst_id && chal_is_invoice_created = 0 && chal_cust_id = '" + customerId + "'";
+    var sql = "SELECT challans.chal_id, challans.chal_no, challans.chal_date, challans.chal_prod_id, challans.chal_veh_id, challans.chal_quantity, vehicles.veh_number, products.prod_name, products.prod_unit, products.prod_rate, gst.gst_id AS chal_gst_id, gst.gst_hsn, gst.gst_percentage FROM challans, vehicles, products, gst WHERE challans.chal_veh_id = vehicles.veh_id && challans.chal_prod_id = products.prod_id && products.prod_gst_id = gst.gst_id && chal_is_invoice_created = 0 && chal_cust_id = '" + customerId + "'";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -457,7 +458,7 @@ getData.prototype.get_quatation_products_by_id = function(quat_id, connection, c
 // Purchase queries
 getData.prototype.get_purchases = function(connection, callback) {
 
-    var sql = "select purchases.pur_id, purchases.pur_date, vendors.vend_id AS pur_vend_id, vendors.vend_name AS pur_vendor, vendors.vend_address AS pur_address, vendors.vend_contact AS pur_contact, vendors.vend_contact_person AS pur_contact_person from vendors, purchases where vendors.vend_id=purchases.pur_vendor_id";
+    var sql = "select purchases.pur_id, purchases.pur_date, purchases.pur_product_total, purchases.pur_total_tax, purchases.pur_total_amount, purchases.pur_round_off, purchases.pur_without_tax, vendors.vend_id AS pur_vend_id, vendors.vend_name AS pur_vendor, vendors.vend_address AS pur_address, vendors.vend_contact AS pur_contact, vendors.vend_contact_person AS pur_contact_person from vendors, purchases where vendors.vend_id=purchases.pur_vendor_id";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -468,7 +469,7 @@ getData.prototype.get_purchases = function(connection, callback) {
 }
 
 getData.prototype.get_purchase_by_id = function(pur_id, connection, callback) {
-    var sql = "SELECT purchases.pur_id, purchases.pur_date, purchases.pur_total_amount, vendors.vend_name AS pur_vendor, vendors.vend_address AS vend_address, vendors.vend_contact AS pur_contact, vendors.vend_contact_person AS pur_contact_person from vendors, purchases WHERE vendors.vend_id=purchases.pur_vendor_id && pur_id = '" + pur_id + "'";
+    var sql = "SELECT purchases.pur_id, purchases.pur_date, purchases.pur_product_total, purchases.pur_total_tax, purchases.pur_total_amount, purchases.pur_round_off, purchases.pur_without_tax, vendors.vend_name AS pur_vendor, vendors.vend_address AS vend_address, vendors.vend_contact AS pur_contact, vendors.vend_contact_person AS pur_contact_person from vendors, purchases WHERE vendors.vend_id=purchases.pur_vendor_id && pur_id = '" + pur_id + "'";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -546,7 +547,7 @@ getData.prototype.Ws_get_purchase_products_by_id = function(pur_id, connection, 
 
 // Get invoice
 getData.prototype.Ws_get_invoices = function(connection, callback) {
-    var sql = "select invoices.inv_id, invoices.inv_date, invoices.inv_cust_id, customers.cust_name AS inv_customer, customers.cust_contact_person AS inv_contact_person, customers.cust_contact AS inv_contact, customers.cust_address AS inv_address, invoices.inv_total_amount, invoices.inv_without_tax from invoices, customers where invoices.inv_cust_id=customers.cust_id";
+    var sql = "select invoices.inv_id, invoices.inv_date, invoices.inv_cust_id, customers.cust_name AS inv_customer, customers.cust_contact_person AS inv_contact_person, customers.cust_contact AS inv_contact, customers.cust_address AS inv_address, invoices.inv_total_amount, invoices.inv_without_tax, invoices.gst_id, gst.gst_percentage from invoices, customers, gst where invoices.inv_cust_id=customers.cust_id && invoices.gst_id = gst.gst_id";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -557,7 +558,7 @@ getData.prototype.Ws_get_invoices = function(connection, callback) {
 }
 
 getData.prototype.get_invoice_by_id = function(inv_id, connection, callback) {
-    var sql = "select invoices.inv_id, invoices.inv_date, invoices.inv_product_total, invoices.inv_total_tax, invoices.inv_total_amount, invoices.inv_round_off, invoices.inv_without_tax, customers.cust_id AS inv_cust_id, customers.cust_name AS inv_customer, customers.cust_address AS inv_address, customers.cust_contact AS inv_contact, customers.cust_contact_person AS inv_contact_person from customers, invoices WHERE customers.cust_id=invoices.inv_cust_id && inv_id = '" + inv_id + "'";
+    var sql = "select invoices.inv_id, invoices.inv_date, invoices.inv_product_total, invoices.inv_total_tax, invoices.inv_total_amount, invoices.inv_round_off, invoices.inv_without_tax, customers.cust_id AS inv_cust_id, customers.cust_name AS inv_customer, customers.cust_address AS inv_address, customers.cust_contact AS inv_contact, customers.cust_contact_person AS inv_contact_person, invoices.gst_id AS inv_gst_id, gst.gst_percentage from customers, invoices, gst WHERE customers.cust_id=invoices.inv_cust_id && invoices.gst_id = gst.gst_id && inv_id = '" + inv_id + "'";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -567,13 +568,13 @@ getData.prototype.get_invoice_by_id = function(inv_id, connection, callback) {
     })
 }
 
-getData.prototype.Ws_set_invoice_detail = function(inv_date, inv_cust_id, product_total, total_tax, inv_total, round_off, inv_without_tax, inv_products, connection, callback) {
+getData.prototype.Ws_set_invoice_detail = function(inv_date, inv_cust_id, product_total, total_tax, inv_total, round_off, inv_without_tax, gst_id, inv_products, connection, callback) {
     connection.beginTransaction(function(error) {
         if (error) {
             callback(error);
         } else {
 
-            var sql = "INSERT INTO invoices VALUES (null,'" + inv_date + "','" + inv_cust_id + "','" + product_total + "','" + total_tax + "','" + inv_total + "','" + round_off + "','" + inv_without_tax + "')";
+            var sql = "INSERT INTO invoices VALUES (null,'" + inv_date + "','" + inv_cust_id + "','" + product_total + "','" + total_tax + "','" + inv_total + "','" + round_off + "','" + inv_without_tax + "','" + gst_id + "')";
             connection.query(sql, function(error, result) {
                 if (error) {
                     return connection.rollback(function() {
@@ -620,7 +621,7 @@ getData.prototype.Ws_set_invoice_detail = function(inv_date, inv_cust_id, produc
 
 getData.prototype.get_invoice_products_by_id = function(inv_id, connection, callback) {
 
-    var sql = "SELECT invoice_products.chal_id, challans.chal_no, challans.chal_date, invoice_products.inv_prod_qty AS prod_qty, vehicles.veh_number, products.prod_name, products.prod_unit, invoice_products.inv_prod_rate AS prod_rate, gst.gst_hsn AS prod_hsn, gst.gst_percentage AS prod_percentage, invoice_products.inv_prod_subtotal AS prod_sub_total, invoice_products.inv_prod_tax AS prod_tax, invoice_products.prod_total_amount FROM gst, challans, vehicles, products, invoice_products WHERE invoice_products.chal_id = challans.chal_id && products.prod_id = invoice_products.prod_id && gst.gst_id = products.prod_gst_id && challans.chal_veh_id = vehicles.veh_id && inv_id = '" + inv_id + "'";
+    var sql = "SELECT invoice_products.chal_id, challans.chal_no, challans.chal_date, invoice_products.inv_prod_qty AS prod_qty, vehicles.veh_number, products.prod_name, products.prod_unit, invoice_products.inv_prod_rate AS prod_rate, gst.gst_id AS prod_gst_id, gst.gst_hsn AS prod_hsn, gst.gst_percentage AS prod_percentage, invoice_products.inv_prod_subtotal AS prod_sub_total, invoice_products.inv_prod_tax AS prod_tax, invoice_products.prod_total_amount FROM gst, challans, vehicles, products, invoice_products WHERE invoice_products.chal_id = challans.chal_id && products.prod_id = invoice_products.prod_id && gst.gst_id = products.prod_gst_id && challans.chal_veh_id = vehicles.veh_id && inv_id = '" + inv_id + "'";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -632,7 +633,7 @@ getData.prototype.get_invoice_products_by_id = function(inv_id, connection, call
 
 getData.prototype.get_cheque_entries = function(connection, callback) {
 
-    var sql = "SELECT cheque_entries.cheque_entry_id, cheque_entries.cheque_date, cheque_entries.cheque_number, cheque_entries.cheque_amount, cheque_entries.account_no, cheque_entries.cheque_cust_id, customers.cust_name, customers.cust_contact FROM cheque_entries, customers WHERE cheque_entries.cheque_cust_id = customers.cust_id";
+    var sql = "SELECT cheque_entries.cheque_entry_id, cheque_entries.cheque_date, cheque_entries.cheque_number, cheque_entries.cheque_amount, cheque_entries.cheque_clearence_date, cheque_entries.cheque_cust_id, customers.cust_name, customers.cust_address, account_details.account_id, account_details.account_number, account_details.bank_name, account_details.bank_address FROM cheque_entries, customers, account_details WHERE cheque_entries.cheque_cust_id = customers.cust_id && cheque_entries.account_id = account_details.account_id";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -643,7 +644,7 @@ getData.prototype.get_cheque_entries = function(connection, callback) {
 }
 
 getData.prototype.get_cheque_entry_by_id = function(cheque_entry_id, connection, callback) {
-    var sql = "SELECT cheque_entries.cheque_entry_id, cheque_entries.cheque_date, cheque_entries.cheque_number, cheque_entries.cheque_amount, cheque_entries.account_no, cheque_entries.cheque_cust_id, customers.cust_name, customers.cust_contact FROM cheque_entries, customers WHERE cheque_entries.cheque_cust_id = customers.cust_id && cheque_entry_id = '" + cheque_entry_id + "'";
+    var sql = "SELECT cheque_entries.cheque_entry_id, cheque_entries.cheque_date, cheque_entries.cheque_number, cheque_entries.cheque_amount, cheque_entries.cheque_clearence_date, cheque_entries.cheque_cust_id, customers.cust_name, customers.cust_address, account_details.account_id, account_details.account_number, account_details.bank_name, account_details.bank_address FROM cheque_entries, customers, account_details WHERE cheque_entries.cheque_cust_id = customers.cust_id && cheque_entries.account_id = account_details.account_id && cheque_entries.cheque_entry_id = '" + cheque_entry_id + "'";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -653,8 +654,8 @@ getData.prototype.get_cheque_entry_by_id = function(cheque_entry_id, connection,
     })
 }
 
-getData.prototype.set_cheque_entry = function(cheque_date, cheque_number, cheque_amount, account_no, clearence_date, cheque_cust_id, connection, callback) {
-    var sql = "INSERT INTO cheque_entries VALUES (null,'" + cheque_date + "','" + cheque_number + "','" + cheque_amount + "','" + account_no + "','" + clearence_date + "','" + cheque_cust_id + "')";
+getData.prototype.set_cheque_entry = function(cheque_date, cheque_number, cheque_amount, account_id, clearence_date, cheque_cust_id, connection, callback) {
+    var sql = "INSERT INTO cheque_entries VALUES (null,'" + cheque_date + "','" + cheque_number + "','" + cheque_amount + "','" + account_id + "','" + clearence_date + "','" + cheque_cust_id + "')";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -664,11 +665,12 @@ getData.prototype.set_cheque_entry = function(cheque_date, cheque_number, cheque
     })
 }
 
-getData.prototype.update_cheque_entry = function(cheque_entry_id, cheque_date, cheque_number, cheque_amount, account_no, clearence_date, cheque_cust_id, connection, callback) {
-    var sql = "UPDATE cheque_entries SET cheque_date='" + cheque_date + "', cheque_number='" + cheque_number + "',cheque_amount='" + cheque_amount + "', account_no='" + account_no + "', cheque_clearence_date='" + clearence_date + "', cheque_cust_id='" + cheque_cust_id + "' WHERE cheque_entry_id = '" + cheque_entry_id + "'";
+getData.prototype.update_cheque_entry = function(cheque_entry_id, cheque_date, cheque_number, cheque_amount, account_id, clearence_date, cheque_cust_id, connection, callback) {
+    var sql = "UPDATE cheque_entries SET cheque_date='" + cheque_date + "', cheque_number='" + cheque_number + "',cheque_amount='" + cheque_amount + "', account_id='" + account_id + "', cheque_clearence_date='" + clearence_date + "', cheque_cust_id='" + cheque_cust_id + "' WHERE cheque_entry_id = '" + cheque_entry_id + "'";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
+            console.log("Cheque error" + error);
         } else {
             callback(rows);
         }
@@ -1344,7 +1346,6 @@ getData.prototype.get_insurance_details = function(connection, callback) {
 
 getData.prototype.set_insurance_detail = function(policy_no, issued_date, vehicle_id, premium_amount, insurance_company, nominee_name, additional_comments, connection, callback) {
     var sql = "INSERT INTO insurance_details VALUES (null,'" + policy_no + "','" + issued_date + "','" + vehicle_id + "','" + premium_amount + "','" + insurance_company + "','" + nominee_name + "','" + additional_comments + "')";
-    console.log("Update Insurance " + sql);
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);

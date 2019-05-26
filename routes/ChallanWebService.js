@@ -142,8 +142,7 @@ exports.Ws_set_challan = function(request, response) {
             var veh_id = reqJsonString.chal_veh_id;
             var chal_qty = reqJsonString.chal_quantity;
             var is_invoice_created = reqJsonString.chal_is_invoice_created;
-            if (chal_date == "" || chal_date == null || chal_date == undefined ||
-                chal_no == "" || chal_no == null || chal_no == undefined ||
+            if (chal_no == "" || chal_no == null || chal_no == undefined ||
                 cust_id == "" || cust_id == null || cust_id == undefined ||
                 prod_id == "" || prod_id == null || prod_id == undefined ||
                 veh_id == "" || veh_id == null || veh_id == undefined ||

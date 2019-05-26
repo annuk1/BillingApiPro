@@ -133,12 +133,14 @@ exports.Ws_set_invoice = function(request, response) {
             var inv_total = reqJsonString.inv_total_amount;
             var round_off = reqJsonString.inv_round_off;
             var inv_without_tax = reqJsonString.inv_without_tax;
+            var gst_id = reqJsonString.gst_id;
             var inv_products = reqJsonString.inv_products;
 
             if (inv_date == "" || inv_date == null || inv_date == undefined ||
                 cust_id == "" || cust_id == null || cust_id == undefined ||
                 inv_total == 0 || inv_total == undefined ||
                 product_total == 0 || product_total == undefined ||
+                gst_id == "" || gst_id == null || gst_id == undefined ||
                 inv_products == null || inv_products == undefined) {
                 response.send(invalidData);
                 return;
@@ -156,7 +158,7 @@ exports.Ws_set_invoice = function(request, response) {
             response.send(error);
             return;
         } else {
-            ObjectDB.Ws_set_invoice_detail(inv_date, cust_id, product_total, total_tax, inv_total, round_off, inv_without_tax, inv_products, connection, function(callback) {
+            ObjectDB.Ws_set_invoice_detail(inv_date, cust_id, product_total, total_tax, inv_total, round_off, inv_without_tax, gst_id, inv_products, connection, function(callback) {
                 if (callback) {
                     if (callback.affectedRows < 1) {
                         response.send(error);

@@ -213,4 +213,4 @@ app.post('/getSelectedMonthInvoices', Wscall_Dashboard.Ws_get_selected_month_inv
 
 var port = process.env.PORT || 5000;
 app.listen(port);
-console.log('Listening on port ..' + port);;
+console.log('Listening on port ..' + port);
