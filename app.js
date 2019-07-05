@@ -79,6 +79,7 @@ var Wscall_Emi = require('./routes/EmiWebService.js');
 var Wscall_Trip = require('./routes/TripWebService.js');
 var Wscall_Insurance = require('./routes/InsuranceWebService.js');
 var Wscall_Dashboard = require('./routes/DashboardWebService.js');
+var Wscall_Invoice_wt = require('./routes/InvoiceWithoutTaxWebService.js');
 
 // Customer web services
 app.post('/getCustomers', Wscall_Customer.Ws_get_customers);
@@ -118,6 +119,7 @@ app.post('/getQuatationById', Wscall_Quatation.Ws_get_quatation_by_id);
 // Invoice web services
 app.post('/getInvoices', Wscall_Invoice.Ws_get_invoices);
 app.post('/addInvoice', Wscall_Invoice.Ws_set_invoice);
+app.post('/updateInvoice', Wscall_Invoice.Ws_update_invoice);
 app.post('/getInvoiceProductsById', Wscall_Invoice.Ws_get_invoice_products_by_id);
 app.post('/getInvoiceById', Wscall_Invoice.Ws_get_invoice_by_id);
 
@@ -210,6 +212,13 @@ app.post('/getPurchaseTotalWithTax', Wscall_Dashboard.Ws_get_purchase_total_with
 app.post('/getInvoiceTotalWithoutTax', Wscall_Dashboard.Ws_get_invoice_total_without_tax);
 app.post('/getPurchaseTotalWithoutTax', Wscall_Dashboard.Ws_get_purchase_total_without_tax);
 app.post('/getSelectedMonthInvoices', Wscall_Dashboard.Ws_get_selected_month_invoices);
+
+// Invoice without tax web services
+app.post('/getInvoicesWithoutTax', Wscall_Invoice_wt.Ws_get_invoices_wt);
+app.post('/addInvoiceWithoutTax', Wscall_Invoice_wt.Ws_set_invoice_wt);
+app.post('/updateInvoiceWithoutTax', Wscall_Invoice_wt.Ws_update_invoice_wt);
+app.post('/getInvoiceProductsWithoutTaxById', Wscall_Invoice_wt.Ws_get_invoice_products_wt_by_id);
+app.post('/getInvoiceWithoutTaxById', Wscall_Invoice_wt.Ws_get_invoice_wt_by_id);
 
 var port = process.env.PORT || 5000;
 app.listen(port);

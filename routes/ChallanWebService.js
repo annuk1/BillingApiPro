@@ -139,12 +139,15 @@ exports.Ws_set_challan = function(request, response) {
             var chal_no = reqJsonString.chal_no;
             var cust_id = reqJsonString.chal_cust_id;
             var prod_id = reqJsonString.chal_prod_id;
+            var prod_rate = reqJsonString.chal_prod_rate;
             var veh_id = reqJsonString.chal_veh_id;
             var chal_qty = reqJsonString.chal_quantity;
             var is_invoice_created = reqJsonString.chal_is_invoice_created;
+
             if (chal_no == "" || chal_no == null || chal_no == undefined ||
                 cust_id == "" || cust_id == null || cust_id == undefined ||
                 prod_id == "" || prod_id == null || prod_id == undefined ||
+                prod_rate == "" || prod_rate == null || prod_rate == undefined ||
                 veh_id == "" || veh_id == null || veh_id == undefined ||
                 chal_qty == "" || chal_qty == null || chal_qty == undefined) {
                 response.send(invalidData);
@@ -163,7 +166,7 @@ exports.Ws_set_challan = function(request, response) {
             response.send(error);
             return;
         } else {
-            ObjectDB.set_challan_detail(chal_no, chal_date, chal_qty, cust_id, prod_id, veh_id, is_invoice_created, connection, function(callback) {
+            ObjectDB.set_challan_detail(chal_no, chal_date, chal_qty, cust_id, prod_id, prod_rate, veh_id, is_invoice_created, connection, function(callback) {
                 if (callback) {
                     data = JSON.stringify(callback);
 
@@ -208,13 +211,16 @@ exports.Ws_update_challan = function(request, response) {
             var chal_no = reqJsonString.chal_no;
             var cust_id = reqJsonString.chal_cust_id;
             var prod_id = reqJsonString.chal_prod_id;
+            var prod_rate = reqJsonString.chal_prod_rate;
             var veh_id = reqJsonString.chal_veh_id;
             var chal_qty = reqJsonString.chal_quantity;
+
             if (chal_id == "" || chal_id == null || chal_id == undefined ||
                 chal_date == "" || chal_date == null || chal_date == undefined ||
                 chal_no == "" || chal_no == null || chal_no == undefined ||
                 cust_id == "" || cust_id == null || cust_id == undefined ||
                 prod_id == "" || prod_id == null || prod_id == undefined ||
+                prod_rate == "" || prod_rate == null || prod_rate == undefined ||
                 veh_id == "" || veh_id == null || veh_id == undefined ||
                 chal_qty == "" || chal_qty == null || chal_qty == undefined) {
                 response.send(invalidData);
@@ -233,7 +239,7 @@ exports.Ws_update_challan = function(request, response) {
             response.send(error);
             return;
         } else {
-            ObjectDB.update_challan_detail(chal_id, chal_no, chal_date, chal_qty, cust_id, prod_id, veh_id, connection, function(callback) {
+            ObjectDB.update_challan_detail(chal_id, chal_no, chal_date, chal_qty, cust_id, prod_id, prod_rate, veh_id, connection, function(callback) {
                 if (callback) {
                     if (callback.affectedRows < 1) {
                         response.send(error);

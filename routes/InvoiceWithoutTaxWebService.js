@@ -11,7 +11,7 @@ var http = require('http');
 var ObjDB = require("./DataAccess.js");
 var ObjectDB = new ObjDB();
 
-exports.Ws_get_invoices = function(request, response) {
+exports.Ws_get_invoices_wt = function(request, response) {
 
     var objutil = require("./Utility.js");
 
@@ -26,7 +26,7 @@ exports.Ws_get_invoices = function(request, response) {
             return;
         } else {
 
-            ObjectDB.Ws_get_invoices(connection, function(callback) {
+            ObjectDB.Ws_get_invoices_wt(connection, function(callback) {
                 if (callback) {
                     var newsubstr = JSON.stringify(callback);
 
@@ -53,7 +53,7 @@ exports.Ws_get_invoices = function(request, response) {
     })
 };
 
-exports.Ws_get_invoice_by_id = function(request, response) {
+exports.Ws_get_invoice_wt_by_id = function(request, response) {
 
     var objutil = require("./Utility.js");
 
@@ -86,7 +86,7 @@ exports.Ws_get_invoice_by_id = function(request, response) {
             response.send(error);
             return;
         } else {
-            ObjectDB.get_invoice_by_id(inv_id, connection, function(callback) {
+            ObjectDB.get_invoice_wt_by_id(inv_id, connection, function(callback) {
                 if (callback) {
                     var newsubstr = JSON.stringify(callback);
 
@@ -115,7 +115,7 @@ exports.Ws_get_invoice_by_id = function(request, response) {
 }
 
 //This web service is use to set invoice details
-exports.Ws_set_invoice = function(request, response) {
+exports.Ws_set_invoice_wt = function(request, response) {
 
     var objutil = require("./Utility.js");
 
@@ -129,7 +129,6 @@ exports.Ws_set_invoice = function(request, response) {
             var inv_date = reqJsonString.inv_date;
             var cust_id = reqJsonString.inv_cust_id;
             var product_total = reqJsonString.inv_product_total;
-            var total_tax = reqJsonString.inv_total_tax;
             var inv_total = reqJsonString.inv_total_amount;
             var round_off = reqJsonString.inv_round_off;
             var inv_without_tax = reqJsonString.inv_without_tax;
@@ -156,7 +155,7 @@ exports.Ws_set_invoice = function(request, response) {
             response.send(error);
             return;
         } else {
-            ObjectDB.Ws_set_invoice_detail(inv_date, cust_id, product_total, total_tax, inv_total, round_off, inv_without_tax, inv_products, connection, function(callback) {
+            ObjectDB.Ws_set_invoice_wt_detail(inv_date, cust_id, product_total, inv_total, round_off, inv_without_tax, inv_products, connection, function(callback) {
                 if (callback) {
                     if (callback.affectedRows < 1) {
                         response.send(error);
@@ -179,7 +178,7 @@ exports.Ws_set_invoice = function(request, response) {
 }
 
 //This web service is use to set invoice details
-exports.Ws_update_invoice = function(request, response) {
+exports.Ws_update_invoice_wt = function(request, response) {
 
     var objutil = require("./Utility.js");
 
@@ -194,7 +193,6 @@ exports.Ws_update_invoice = function(request, response) {
             var inv_date = reqJsonString.inv_date;
             var cust_id = reqJsonString.inv_cust_id;
             var product_total = reqJsonString.inv_product_total;
-            var total_tax = reqJsonString.inv_total_tax;
             var inv_total = reqJsonString.inv_total_amount;
             var round_off = reqJsonString.inv_round_off;
             var inv_without_tax = reqJsonString.inv_without_tax;
@@ -222,7 +220,7 @@ exports.Ws_update_invoice = function(request, response) {
             response.send(error);
             return;
         } else {
-            ObjectDB.Ws_update_invoice_detail(inv_id, inv_date, cust_id, product_total, total_tax, inv_total, round_off, inv_without_tax, inv_products, connection, function(callback) {
+            ObjectDB.Ws_update_invoice_wt_detail(inv_id, inv_date, cust_id, product_total, inv_total, round_off, inv_without_tax, inv_products, connection, function(callback) {
                 if (callback) {
                     if (callback.affectedRows < 1) {
                         response.send(error);
@@ -244,7 +242,7 @@ exports.Ws_update_invoice = function(request, response) {
     })
 }
 
-exports.Ws_get_invoice_products_by_id = function(request, response) {
+exports.Ws_get_invoice_products_wt_by_id = function(request, response) {
 
     var objutil = require("./Utility.js");
 
@@ -278,7 +276,7 @@ exports.Ws_get_invoice_products_by_id = function(request, response) {
             response.send(error);
             return;
         } else {
-            ObjectDB.get_invoice_products_by_id(inv_id, connection, function(callback) {
+            ObjectDB.get_invoice_products_wt_by_id(inv_id, connection, function(callback) {
                 if (callback) {
                     data = callback;
                     var newsubstr = JSON.stringify(data);
