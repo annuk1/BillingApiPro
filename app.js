@@ -80,6 +80,7 @@ var Wscall_Trip = require('./routes/TripWebService.js');
 var Wscall_Insurance = require('./routes/InsuranceWebService.js');
 var Wscall_Dashboard = require('./routes/DashboardWebService.js');
 var Wscall_Invoice_wt = require('./routes/InvoiceWithoutTaxWebService.js');
+var Wscall_Email = require('./routes/SendEmailWebService.js');
 
 // Customer web services
 app.post('/getCustomers', Wscall_Customer.Ws_get_customers);
@@ -219,6 +220,9 @@ app.post('/addInvoiceWithoutTax', Wscall_Invoice_wt.Ws_set_invoice_wt);
 app.post('/updateInvoiceWithoutTax', Wscall_Invoice_wt.Ws_update_invoice_wt);
 app.post('/getInvoiceProductsWithoutTaxById', Wscall_Invoice_wt.Ws_get_invoice_products_wt_by_id);
 app.post('/getInvoiceWithoutTaxById', Wscall_Invoice_wt.Ws_get_invoice_wt_by_id);
+
+// send Email
+app.post('/sendEmail', Wscall_Email.sendMail);
 
 var port = process.env.PORT || 5000;
 app.listen(port);

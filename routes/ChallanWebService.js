@@ -144,12 +144,12 @@ exports.Ws_set_challan = function(request, response) {
             var chal_qty = reqJsonString.chal_quantity;
             var is_invoice_created = reqJsonString.chal_is_invoice_created;
 
-            if (chal_no == "" || chal_no == null || chal_no == undefined ||
-                cust_id == "" || cust_id == null || cust_id == undefined ||
+            if (cust_id == "" || cust_id == null || cust_id == undefined ||
                 prod_id == "" || prod_id == null || prod_id == undefined ||
                 prod_rate == "" || prod_rate == null || prod_rate == undefined ||
                 veh_id == "" || veh_id == null || veh_id == undefined ||
                 chal_qty == "" || chal_qty == null || chal_qty == undefined) {
+                console.log("Add challan " + invalidData);
                 response.send(invalidData);
                 return;
             }

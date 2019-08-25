@@ -308,7 +308,7 @@ getData.prototype.get_challan_by_id = function(challanId, connection, callback) 
 }
 
 getData.prototype.set_challan_detail = function(chal_no, chal_date, chal_qty, cust_id, prod_id, prod_rate, veh_id, is_invoice_created, connection, callback) {
-    var sql = "INSERT INTO challans VALUES (null,'" + chal_no + "','" + chal_date + "','" + chal_qty + "','" + cust_id + "','" + prod_id + "','" + prod_rate + "','" + veh_id + "','" + is_invoice_created + "')";
+    var sql = "INSERT INTO challans VALUES (null,'" + chal_no + "'," + chal_date + ",'" + chal_qty + "','" + cust_id + "','" + prod_id + "','" + prod_rate + "','" + veh_id + "','" + is_invoice_created + "')";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -546,7 +546,7 @@ getData.prototype.Ws_get_purchase_products_by_id = function(pur_id, connection, 
 
 // Get invoice
 getData.prototype.Ws_get_invoices = function(connection, callback) {
-    var sql = "select invoices.inv_id, invoices.inv_date, invoices.inv_cust_id, customers.cust_name AS inv_customer, customers.cust_contact_person AS inv_contact_person, customers.cust_contact AS inv_contact, customers.cust_address AS inv_address, invoices.inv_total_amount, invoices.inv_without_tax from invoices, customers where invoices.inv_cust_id=customers.cust_id";
+    var sql = "select invoices.inv_id, invoices.inv_date, invoices.inv_cust_id, customers.cust_name AS inv_customer, customers.cust_contact_person AS inv_contact_person, customers.cust_contact AS inv_contact, customers.cust_address AS inv_address, customers.cust_email AS inv_email, invoices.inv_total_amount, invoices.inv_without_tax from invoices, customers where invoices.inv_cust_id=customers.cust_id";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -557,7 +557,7 @@ getData.prototype.Ws_get_invoices = function(connection, callback) {
 }
 
 getData.prototype.get_invoice_by_id = function(inv_id, connection, callback) {
-    var sql = "select invoices.inv_id, invoices.inv_date, invoices.inv_product_total, invoices.inv_total_tax, invoices.inv_total_amount, invoices.inv_round_off, invoices.inv_without_tax, customers.cust_id AS inv_cust_id, customers.cust_name AS inv_customer, customers.cust_address AS inv_address, customers.cust_contact AS inv_contact, customers.cust_contact_person AS inv_contact_person from customers, invoices WHERE customers.cust_id=invoices.inv_cust_id && inv_id = '" + inv_id + "'";
+    var sql = "select invoices.inv_id, invoices.inv_date, invoices.inv_product_total, invoices.inv_total_tax, invoices.inv_total_amount, invoices.inv_round_off, invoices.inv_without_tax, customers.cust_id AS inv_cust_id, customers.cust_name AS inv_customer, customers.cust_address AS inv_address, customers.cust_contact AS inv_contact, customers.cust_contact_person AS inv_contact_person, customers.cust_email AS inv_email from customers, invoices WHERE customers.cust_id=invoices.inv_cust_id && inv_id = '" + inv_id + "'";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -1455,7 +1455,7 @@ getData.prototype.get_insurance_detail_by_id = function(insurance_id, connection
 
 // Get invoice without tax
 getData.prototype.Ws_get_invoices_wt = function(connection, callback) {
-    var sql = "select invoices_wt.inv_id, invoices_wt.inv_date, invoices_wt.inv_cust_id, customers.cust_name AS inv_customer, customers.cust_contact_person AS inv_contact_person, customers.cust_contact AS inv_contact, customers.cust_address AS inv_address, invoices_wt.inv_total_amount, invoices_wt.inv_without_tax from invoices_wt, customers where invoices_wt.inv_cust_id=customers.cust_id";
+    var sql = "select invoices_wt.inv_id, invoices_wt.inv_date, invoices_wt.inv_cust_id, customers.cust_name AS inv_customer, customers.cust_contact_person AS inv_contact_person, customers.cust_contact AS inv_contact, customers.cust_address AS inv_address, customers.cust_email AS inv_email, invoices_wt.inv_total_amount, invoices_wt.inv_without_tax from invoices_wt, customers where invoices_wt.inv_cust_id=customers.cust_id";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -1466,7 +1466,7 @@ getData.prototype.Ws_get_invoices_wt = function(connection, callback) {
 }
 
 getData.prototype.get_invoice_wt_by_id = function(inv_id, connection, callback) {
-    var sql = "select invoices_wt.inv_id, invoices_wt.inv_date, invoices_wt.inv_product_total, invoices_wt.inv_total_amount, invoices_wt.inv_round_off, invoices_wt.inv_without_tax, customers.cust_id AS inv_cust_id, customers.cust_name AS inv_customer, customers.cust_address AS inv_address, customers.cust_contact AS inv_contact, customers.cust_contact_person AS inv_contact_person from customers, invoices_wt WHERE customers.cust_id=invoices_wt.inv_cust_id && inv_id = '" + inv_id + "'";
+    var sql = "select invoices_wt.inv_id, invoices_wt.inv_date, invoices_wt.inv_product_total, invoices_wt.inv_total_amount, invoices_wt.inv_round_off, invoices_wt.inv_without_tax, customers.cust_id AS inv_cust_id, customers.cust_name AS inv_customer, customers.cust_address AS inv_address, customers.cust_contact AS inv_contact, customers.cust_contact_person AS inv_contact_person, customers.cust_email AS inv_email from customers, invoices_wt WHERE customers.cust_id=invoices_wt.inv_cust_id && inv_id = '" + inv_id + "'";
     connection.query(sql, function(error, rows) {
         if (error) {
             callback(error);
@@ -1593,5 +1593,6 @@ getData.prototype.get_invoice_products_wt_by_id = function(inv_id, connection, c
         }
     })
 }
+
 
 exports = module.exports = getData;
